@@ -20,6 +20,16 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -132,6 +142,8 @@ function TenantsPage() {
   const [pageSize] = useState(10);
   const [delTarget, setDelTarget] = useState<Tenant | null>(null);
   const [data, setData] = useState<Tenant[]>(MOCK);
+  const [formOpen, setFormOpen] = useState(false);
+  const [editing, setEditing] = useState<Tenant | null>(null);
 
   const filtered = useMemo(() => {
     return data.filter((t) => {
@@ -365,7 +377,7 @@ function TenantsPage() {
                         <Button size="sm" variant="ghost" onClick={() => toast.info(`查看 ${t.name}`)}>
                           <Eye className="h-4 w-4" />
                         </Button>
-                        <Button size="sm" variant="ghost" onClick={() => toast.info(`编辑 ${t.name}`)}>
+                        <Button size="sm" variant="ghost" onClick={() => { setEditing(t); setFormOpen(true); }}>
                           <Pencil className="h-4 w-4" />
                         </Button>
                         <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => setDelTarget(t)}>
