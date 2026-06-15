@@ -76,12 +76,18 @@ interface Tenant {
   type: TenantType;
   industry: string;
   product: string;
+  contact: string;
+  contactPhone: string;
   coopContent: string;
   coopStatus: CoopStatus;
   authStatus: AuthStatus;
 }
 
 const INDUSTRIES = ["金融", "电商", "制造", "教育", "医疗", "互联网", "物流"];
+const CONTACT_NAMES = [
+  "张伟", "王芳", "李娜", "刘洋", "陈思", "杨明",
+  "赵磊", "黄雨", "周凯", "吴婷",
+];
 
 // 认证等级列表（与 认证等级 页面保持一致）
 type LevelKey = "L1" | "L2" | "L3" | "L4";
@@ -165,6 +171,8 @@ const MOCK: Tenant[] = Array.from({ length: 47 }).map((_, i) => {
     type: types[i % 2],
     industry: INDUSTRIES[i % INDUSTRIES.length],
     product: ["数据中台", "智能风控", "营销云", "供应链", "AI平台"][i % 5],
+    contact: CONTACT_NAMES[i % CONTACT_NAMES.length],
+    contactPhone: "138" + String(10000000 + ((i * 1357) % 89999999)).slice(0, 8),
     coopContent: ["数据接入", "联合运营", "技术共建", "渠道分销"][i % 4],
     coopStatus: coops[i % coops.length],
     authStatus: auths[i % auths.length],
@@ -407,6 +415,7 @@ function TenantsPage() {
                 <TableHead>类型</TableHead>
                 <TableHead>行业</TableHead>
                 <TableHead>主营产品</TableHead>
+                <TableHead className="whitespace-nowrap">联系方式</TableHead>
                 <TableHead>合作内容</TableHead>
                 <TableHead>合作状态</TableHead>
                 <TableHead>认证状态</TableHead>
@@ -417,7 +426,7 @@ function TenantsPage() {
             <TableBody>
               {pageData.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={11} className="text-center py-12 text-muted-foreground">
+                  <TableCell colSpan={12} className="text-center py-12 text-muted-foreground">
                     暂无匹配的租户
                   </TableCell>
                 </TableRow>
@@ -432,6 +441,18 @@ function TenantsPage() {
                     </TableCell>
                     <TableCell>{t.industry}</TableCell>
                     <TableCell>{t.product}</TableCell>
+                    <TableCell className="whitespace-nowrap">
+                      {t.contact || t.contactPhone ? (
+                        <div className="flex flex-col leading-tight">
+                          <span className="text-sm font-medium text-foreground">{t.contact || "—"}</span>
+                          <span className="text-xs text-muted-foreground font-mono tabular-nums">
+                            {t.contactPhone || "—"}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">未填写</span>
+                      )}
+                    </TableCell>
                     <TableCell>{t.coopContent}</TableCell>
                     <TableCell>
                       <Badge variant="outline" className={coopBadge(t.coopStatus)}>{t.coopStatus}</Badge>
@@ -579,6 +600,8 @@ function TenantFormDialog({ open, onOpenChange, editing, onSubmit }: TenantFormP
     type: "企业用户",
     industry: INDUSTRIES[0],
     product: "",
+    contact: "",
+    contactPhone: "",
     coopContent: "",
     coopStatus: "合作中",
     authStatus: "待认证",
@@ -651,6 +674,26 @@ function TenantFormDialog({ open, onOpenChange, editing, onSubmit }: TenantFormP
           <div className="space-y-1.5">
             <Label>主营产品</Label>
             <Input value={form.product} onChange={(e) => set("product", e.target.value)} placeholder="如：数据中台" />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>联系人 / 负责人</Label>
+            <Input
+              value={form.contact}
+              onChange={(e) => set("contact", e.target.value)}
+              placeholder="如：张伟"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>联系电话</Label>
+            <Input
+              value={form.contactPhone}
+              onChange={(e) => set("contactPhone", e.target.value.replace(/[^\d-]/g, ""))}
+              placeholder="如：13800001234"
+              inputMode="tel"
+              maxLength={20}
+            />
           </div>
 
           <div className="space-y-1.5 md:col-span-2">
