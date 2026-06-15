@@ -600,11 +600,29 @@ function TenantsPage() {
                           </Tooltip>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Button size="sm" variant="ghost" onClick={() => setViewTarget(t)}>
+                              <Button size="sm" variant="ghost" className="relative" onClick={() => setViewTarget(t)}>
                                 <Eye className="h-4 w-4" />
+                                {(() => {
+                                  if (t.coopStatus !== "合作中") return null;
+                                  const info = computePassedInfo(t, policies[t.id]);
+                                  if (!info || info.isPermanent || info.valid) return null;
+                                  return (
+                                    <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500 ring-2 ring-background" />
+                                  );
+                                })()}
                               </Button>
                             </TooltipTrigger>
-                            <TooltipContent>查看租户详情</TooltipContent>
+                            <TooltipContent>
+                              {(() => {
+                                if (t.coopStatus === "合作中") {
+                                  const info = computePassedInfo(t, policies[t.id]);
+                                  if (info && !info.isPermanent && !info.valid) {
+                                    return "查看租户详情（认证已过期）";
+                                  }
+                                }
+                                return "查看租户详情";
+                              })()}
+                            </TooltipContent>
                           </Tooltip>
                           <Tooltip>
                             <TooltipTrigger asChild>
