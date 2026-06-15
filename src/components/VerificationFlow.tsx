@@ -394,7 +394,7 @@ export function VerificationFlow({ subject }: Props) {
                           <ScanFace className="h-6 w-6" />
                         </div>
                         <div className="flex-1">
-                          <div className="text-sm font-medium">{f.label}</div>
+                          <div className="text-sm font-medium">{f.label} <span className="text-destructive">*</span></div>
                           <div className="text-xs text-muted-foreground">{f.hint ?? "点击启动活体检测"}</div>
                         </div>
                         <Button variant="outline" size="sm" onClick={() => { updateField(f.key, "captured"); toast.success("人脸采集成功"); }}>
@@ -410,7 +410,7 @@ export function VerificationFlow({ subject }: Props) {
                           <Upload className="h-6 w-6" />
                         </div>
                         <div className="flex-1">
-                          <div className="text-sm font-medium">{f.label}</div>
+                          <div className="text-sm font-medium">{f.label} <span className="text-destructive">*</span></div>
                           <div className="text-xs text-muted-foreground">{f.hint ?? "支持 JPG / PNG / PDF"}</div>
                         </div>
                         <Button variant="outline" size="sm" onClick={() => { updateField(f.key, "uploaded"); toast.success("上传成功"); }}>
@@ -423,7 +423,7 @@ export function VerificationFlow({ subject }: Props) {
                     <div key={f.key} className="space-y-1.5">
                       <Label className="text-xs flex items-center gap-1.5">
                         <Icon className="h-3.5 w-3.5 text-muted-foreground" />
-                        {f.label}
+                        {f.label} <span className="text-destructive">*</span>
                       </Label>
                       <Input
                         value={form[f.key] ?? ""}

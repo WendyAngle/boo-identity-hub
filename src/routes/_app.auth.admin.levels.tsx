@@ -459,7 +459,7 @@ function CreateLevelDialog({
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="lvl-key">等级编码 *</Label>
+                <Label htmlFor="lvl-key">等级编码 <span className="text-destructive">*</span></Label>
                 <Input
                   id="lvl-key"
                   value={key}
@@ -468,7 +468,7 @@ function CreateLevelDialog({
                 />
               </div>
               <div className="space-y-1.5 sm:col-span-2">
-                <Label htmlFor="lvl-title">等级名称 *</Label>
+                <Label htmlFor="lvl-title">等级名称 <span className="text-destructive">*</span></Label>
                 <Input
                   id="lvl-title"
                   value={title}

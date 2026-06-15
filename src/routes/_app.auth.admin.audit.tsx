@@ -697,7 +697,7 @@ function AuditPage() {
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-2">
-              <Label>驳回原因</Label>
+              <Label>驳回原因 <span className="text-destructive">*</span></Label>
               <Select value={rejectReason} onValueChange={setRejectReason}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
