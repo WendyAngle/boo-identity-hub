@@ -16,6 +16,7 @@ import { Route as AppAuthUserRouteImport } from './routes/_app.auth.user'
 import { Route as AppAuthAdminRouteImport } from './routes/_app.auth.admin'
 import { Route as AppAuthAdminIndexRouteImport } from './routes/_app.auth.admin.index'
 import { Route as AppAuthUserPersonalRouteImport } from './routes/_app.auth.user.personal'
+import { Route as AppAuthUserLoginSimRouteImport } from './routes/_app.auth.user.login-sim'
 import { Route as AppAuthUserEnterpriseRouteImport } from './routes/_app.auth.user.enterprise'
 import { Route as AppAuthAdminUsersRouteImport } from './routes/_app.auth.admin.users'
 import { Route as AppAuthAdminTenantsRouteImport } from './routes/_app.auth.admin.tenants'
@@ -56,6 +57,11 @@ const AppAuthUserPersonalRoute = AppAuthUserPersonalRouteImport.update({
   path: '/personal',
   getParentRoute: () => AppAuthUserRoute,
 } as any)
+const AppAuthUserLoginSimRoute = AppAuthUserLoginSimRouteImport.update({
+  id: '/login-sim',
+  path: '/login-sim',
+  getParentRoute: () => AppAuthUserRoute,
+} as any)
 const AppAuthUserEnterpriseRoute = AppAuthUserEnterpriseRouteImport.update({
   id: '/enterprise',
   path: '/enterprise',
@@ -92,6 +98,7 @@ export interface FileRoutesByFullPath {
   '/auth/admin/tenants': typeof AppAuthAdminTenantsRoute
   '/auth/admin/users': typeof AppAuthAdminUsersRoute
   '/auth/user/enterprise': typeof AppAuthUserEnterpriseRoute
+  '/auth/user/login-sim': typeof AppAuthUserLoginSimRoute
   '/auth/user/personal': typeof AppAuthUserPersonalRoute
   '/auth/admin/': typeof AppAuthAdminIndexRoute
 }
@@ -104,6 +111,7 @@ export interface FileRoutesByTo {
   '/auth/admin/tenants': typeof AppAuthAdminTenantsRoute
   '/auth/admin/users': typeof AppAuthAdminUsersRoute
   '/auth/user/enterprise': typeof AppAuthUserEnterpriseRoute
+  '/auth/user/login-sim': typeof AppAuthUserLoginSimRoute
   '/auth/user/personal': typeof AppAuthUserPersonalRoute
   '/auth/admin': typeof AppAuthAdminIndexRoute
 }
@@ -119,6 +127,7 @@ export interface FileRoutesById {
   '/_app/auth/admin/tenants': typeof AppAuthAdminTenantsRoute
   '/_app/auth/admin/users': typeof AppAuthAdminUsersRoute
   '/_app/auth/user/enterprise': typeof AppAuthUserEnterpriseRoute
+  '/_app/auth/user/login-sim': typeof AppAuthUserLoginSimRoute
   '/_app/auth/user/personal': typeof AppAuthUserPersonalRoute
   '/_app/auth/admin/': typeof AppAuthAdminIndexRoute
 }
@@ -134,6 +143,7 @@ export interface FileRouteTypes {
     | '/auth/admin/tenants'
     | '/auth/admin/users'
     | '/auth/user/enterprise'
+    | '/auth/user/login-sim'
     | '/auth/user/personal'
     | '/auth/admin/'
   fileRoutesByTo: FileRoutesByTo
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
     | '/auth/admin/tenants'
     | '/auth/admin/users'
     | '/auth/user/enterprise'
+    | '/auth/user/login-sim'
     | '/auth/user/personal'
     | '/auth/admin'
   id:
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/_app/auth/admin/tenants'
     | '/_app/auth/admin/users'
     | '/_app/auth/user/enterprise'
+    | '/_app/auth/user/login-sim'
     | '/_app/auth/user/personal'
     | '/_app/auth/admin/'
   fileRoutesById: FileRoutesById
@@ -217,6 +229,13 @@ declare module '@tanstack/react-router' {
       path: '/personal'
       fullPath: '/auth/user/personal'
       preLoaderRoute: typeof AppAuthUserPersonalRouteImport
+      parentRoute: typeof AppAuthUserRoute
+    }
+    '/_app/auth/user/login-sim': {
+      id: '/_app/auth/user/login-sim'
+      path: '/login-sim'
+      fullPath: '/auth/user/login-sim'
+      preLoaderRoute: typeof AppAuthUserLoginSimRouteImport
       parentRoute: typeof AppAuthUserRoute
     }
     '/_app/auth/user/enterprise': {
@@ -279,11 +298,13 @@ const AppAuthAdminRouteWithChildren = AppAuthAdminRoute._addFileChildren(
 
 interface AppAuthUserRouteChildren {
   AppAuthUserEnterpriseRoute: typeof AppAuthUserEnterpriseRoute
+  AppAuthUserLoginSimRoute: typeof AppAuthUserLoginSimRoute
   AppAuthUserPersonalRoute: typeof AppAuthUserPersonalRoute
 }
 
 const AppAuthUserRouteChildren: AppAuthUserRouteChildren = {
   AppAuthUserEnterpriseRoute: AppAuthUserEnterpriseRoute,
+  AppAuthUserLoginSimRoute: AppAuthUserLoginSimRoute,
   AppAuthUserPersonalRoute: AppAuthUserPersonalRoute,
 }
 
