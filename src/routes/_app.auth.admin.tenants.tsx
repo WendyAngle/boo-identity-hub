@@ -171,6 +171,8 @@ const MOCK: Tenant[] = Array.from({ length: 47 }).map((_, i) => {
     type: types[i % 2],
     industry: INDUSTRIES[i % INDUSTRIES.length],
     product: ["数据中台", "智能风控", "营销云", "供应链", "AI平台"][i % 5],
+    contact: CONTACT_NAMES[i % CONTACT_NAMES.length],
+    contactPhone: "138" + String(10000000 + ((i * 1357) % 89999999)).slice(0, 8),
     coopContent: ["数据接入", "联合运营", "技术共建", "渠道分销"][i % 4],
     coopStatus: coops[i % coops.length],
     authStatus: auths[i % auths.length],
