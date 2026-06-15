@@ -181,7 +181,7 @@ function LevelsPage() {
         {levels.map((l) => (
           <Card
             key={l.key}
-            className={`relative overflow-hidden p-5 bg-gradient-to-br ${LEVEL_COLORS[l.key]} border`}
+            className={`relative overflow-hidden p-5 bg-gradient-to-br ${getLevelColor(l.key)} border`}
           >
             <div className="flex items-start justify-between">
               <div>
@@ -299,11 +299,11 @@ function LevelDetailCard({
   const Icon = isPersonal ? User : Building2;
 
   return (
-    <Card className={`relative overflow-hidden bg-gradient-to-br ${LEVEL_COLORS[level.key]} border`}>
+    <Card className={`relative overflow-hidden bg-gradient-to-br ${getLevelColor(level.key)} border`}>
       <div className="p-5 bg-card/70 backdrop-blur-sm">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className={`h-11 w-11 rounded-xl bg-gradient-to-br ${LEVEL_COLORS[level.key]} border flex items-center justify-center font-bold`}>
+            <div className={`h-11 w-11 rounded-xl bg-gradient-to-br ${getLevelColor(level.key)} border flex items-center justify-center font-bold`}>
               {level.key}
             </div>
             <div>
