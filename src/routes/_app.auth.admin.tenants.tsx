@@ -412,6 +412,26 @@ function TenantsPage() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1">
+                        <TooltipProvider delayDuration={150}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className={policies[t.id] ? "text-primary hover:text-primary" : ""}
+                                onClick={() => setPolicyTarget(t)}
+                              >
+                                <ShieldCheck className="h-4 w-4" />
+                                {policies[t.id] && (
+                                  <span className="ml-1 text-[11px] font-medium tabular-nums">
+                                    {policies[t.id].level}
+                                  </span>
+                                )}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>查看 / 设置认证策略</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                         <Button size="sm" variant="ghost" onClick={() => toast.info(`查看 ${t.name}`)}>
                           <Eye className="h-4 w-4" />
                         </Button>
