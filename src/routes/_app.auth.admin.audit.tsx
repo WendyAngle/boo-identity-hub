@@ -33,6 +33,7 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   Select,
   SelectContent,
@@ -531,15 +532,36 @@ function AuditPage() {
                     <TableCell><Badge variant="outline" className={STATUS_BADGE[t.status]}>{t.status}</Badge></TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1">
-                        <Button size="sm" variant="ghost" onClick={() => { setDetail(t); setComment(""); }}>
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button size="sm" variant="ghost" disabled={!canAct} onClick={() => passOne(t)} className="text-emerald-600 hover:text-emerald-700">
-                          <Check className="h-4 w-4" />
-                        </Button>
-                        <Button size="sm" variant="ghost" disabled={!canAct} onClick={() => rejectOne(t)} className="text-rose-600 hover:text-rose-700">
-                          <X className="h-4 w-4" />
-                        </Button>
+                        <TooltipProvider delayDuration={150}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button size="sm" variant="ghost" onClick={() => { setDetail(t); setComment(""); }}>
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>查看审核详情</TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="inline-flex">
+                                <Button size="sm" variant="ghost" disabled={!canAct} onClick={() => passOne(t)} className="text-emerald-600 hover:text-emerald-700">
+                                  <Check className="h-4 w-4" />
+                                </Button>
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent>{canAct ? "审核通过" : "当前状态不可操作"}</TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="inline-flex">
+                                <Button size="sm" variant="ghost" disabled={!canAct} onClick={() => rejectOne(t)} className="text-rose-600 hover:text-rose-700">
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent>{canAct ? "审核驳回" : "当前状态不可操作"}</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </div>
                     </TableCell>
                   </TableRow>
