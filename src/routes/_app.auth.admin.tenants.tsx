@@ -676,6 +676,26 @@ function TenantFormDialog({ open, onOpenChange, editing, onSubmit }: TenantFormP
             <Input value={form.product} onChange={(e) => set("product", e.target.value)} placeholder="如：数据中台" />
           </div>
 
+          <div className="space-y-1.5">
+            <Label>联系人 / 负责人</Label>
+            <Input
+              value={form.contact}
+              onChange={(e) => set("contact", e.target.value)}
+              placeholder="如：张伟"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>联系电话</Label>
+            <Input
+              value={form.contactPhone}
+              onChange={(e) => set("contactPhone", e.target.value.replace(/[^\d-]/g, ""))}
+              placeholder="如：13800001234"
+              inputMode="tel"
+              maxLength={20}
+            />
+          </div>
+
           <div className="space-y-1.5 md:col-span-2">
             <Label>合作内容</Label>
             <Input value={form.coopContent} onChange={(e) => set("coopContent", e.target.value)} placeholder="如：数据接入 / 联合运营" />
