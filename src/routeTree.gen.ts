@@ -13,6 +13,8 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
 import { Route as AppAuthUserRouteImport } from './routes/_app.auth.user'
 import { Route as AppAuthAdminRouteImport } from './routes/_app.auth.admin'
+import { Route as AppAuthAdminIndexRouteImport } from './routes/_app.auth.admin.index'
+import { Route as AppAuthAdminTenantsRouteImport } from './routes/_app.auth.admin.tenants'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
@@ -33,30 +35,57 @@ const AppAuthAdminRoute = AppAuthAdminRouteImport.update({
   path: '/auth/admin',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAuthAdminIndexRoute = AppAuthAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppAuthAdminRoute,
+} as any)
+const AppAuthAdminTenantsRoute = AppAuthAdminTenantsRouteImport.update({
+  id: '/tenants',
+  path: '/tenants',
+  getParentRoute: () => AppAuthAdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
-  '/auth/admin': typeof AppAuthAdminRoute
+  '/auth/admin': typeof AppAuthAdminRouteWithChildren
   '/auth/user': typeof AppAuthUserRoute
+  '/auth/admin/tenants': typeof AppAuthAdminTenantsRoute
+  '/auth/admin/': typeof AppAuthAdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AppIndexRoute
-  '/auth/admin': typeof AppAuthAdminRoute
   '/auth/user': typeof AppAuthUserRoute
+  '/auth/admin/tenants': typeof AppAuthAdminTenantsRoute
+  '/auth/admin': typeof AppAuthAdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/_app/': typeof AppIndexRoute
-  '/_app/auth/admin': typeof AppAuthAdminRoute
+  '/_app/auth/admin': typeof AppAuthAdminRouteWithChildren
   '/_app/auth/user': typeof AppAuthUserRoute
+  '/_app/auth/admin/tenants': typeof AppAuthAdminTenantsRoute
+  '/_app/auth/admin/': typeof AppAuthAdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth/admin' | '/auth/user'
+  fullPaths:
+    | '/'
+    | '/auth/admin'
+    | '/auth/user'
+    | '/auth/admin/tenants'
+    | '/auth/admin/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth/admin' | '/auth/user'
-  id: '__root__' | '/_app' | '/_app/' | '/_app/auth/admin' | '/_app/auth/user'
+  to: '/' | '/auth/user' | '/auth/admin/tenants' | '/auth/admin'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/_app/'
+    | '/_app/auth/admin'
+    | '/_app/auth/user'
+    | '/_app/auth/admin/tenants'
+    | '/_app/auth/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -93,18 +122,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAuthAdminRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/auth/admin/': {
+      id: '/_app/auth/admin/'
+      path: '/'
+      fullPath: '/auth/admin/'
+      preLoaderRoute: typeof AppAuthAdminIndexRouteImport
+      parentRoute: typeof AppAuthAdminRoute
+    }
+    '/_app/auth/admin/tenants': {
+      id: '/_app/auth/admin/tenants'
+      path: '/tenants'
+      fullPath: '/auth/admin/tenants'
+      preLoaderRoute: typeof AppAuthAdminTenantsRouteImport
+      parentRoute: typeof AppAuthAdminRoute
+    }
   }
 }
 
+interface AppAuthAdminRouteChildren {
+  AppAuthAdminTenantsRoute: typeof AppAuthAdminTenantsRoute
+  AppAuthAdminIndexRoute: typeof AppAuthAdminIndexRoute
+}
+
+const AppAuthAdminRouteChildren: AppAuthAdminRouteChildren = {
+  AppAuthAdminTenantsRoute: AppAuthAdminTenantsRoute,
+  AppAuthAdminIndexRoute: AppAuthAdminIndexRoute,
+}
+
+const AppAuthAdminRouteWithChildren = AppAuthAdminRoute._addFileChildren(
+  AppAuthAdminRouteChildren,
+)
+
 interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
-  AppAuthAdminRoute: typeof AppAuthAdminRoute
+  AppAuthAdminRoute: typeof AppAuthAdminRouteWithChildren
   AppAuthUserRoute: typeof AppAuthUserRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
-  AppAuthAdminRoute: AppAuthAdminRoute,
+  AppAuthAdminRoute: AppAuthAdminRouteWithChildren,
   AppAuthUserRoute: AppAuthUserRoute,
 }
 
