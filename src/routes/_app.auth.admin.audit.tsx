@@ -194,24 +194,65 @@ interface AuditItem {
   comment?: string;
 }
 
-const TENANT_POOL = [
-  ["T202600", "字节跳动"],
-  ["T202601", "蚂蚁集团"],
-  ["T202602", "美团点评"],
-  ["T202603", "京东物流"],
-  ["T202604", "宁德时代"],
-  ["T202605", "比亚迪汽车"],
-  ["T202606", "顺丰科技"],
-  ["T202607", "腾讯云"],
-  ["T202608", "阿里云"],
-  ["T202609", "网易严选"],
-] as const;
-
+// 与"租户管理"列表保持一致的租户名称池
+const TENANT_NAMES = [
+  "字节跳动",
+  "蚂蚁集团",
+  "美团点评",
+  "京东物流",
+  "宁德时代",
+  "比亚迪汽车",
+  "顺丰科技",
+  "腾讯云",
+  "阿里云",
+  "网易严选",
+];
 const PERSON_NAMES = ["张伟", "王芳", "李娜", "刘洋", "陈思", "杨明", "赵磊", "黄雨", "周凯", "吴婷", "徐航", "孙悦"];
-
 const LEVELS: LevelKey[] = ["L1", "L2", "L3", "L4"];
 const PROVIDER_IDS: ProviderId[] = ["platform", "alipay", "wechat", "unionpay", "cfca"];
-const STATUSES: Status[] = ["待审核", "审核中", "已通过", "已驳回"];
+
+// 与"租户管理"完全一致的租户类型 / 认证状态 / 认证等级派生
+// 索引规则:
+//   subject:   i % 2  -> 0: 个人, 1: 企业
+//   authStatus: ["待认证","认证中","认证成功","认证失败"][i % 4]
+//   level:     "待认证" 不分配等级；其余按 LEVELS[i % 4]
+const TENANT_AUTH_STATUSES = ["待认证", "认证中", "认证成功", "认证失败"] as const;
+type TenantAuth = typeof TENANT_AUTH_STATUSES[number];
+
+interface TenantRef {
+  id: string;
+  name: string;
+  subject: Subject;
+  tenantAuth: TenantAuth;
+  level?: LevelKey;
+}
+
+const TENANTS: TenantRef[] = Array.from({ length: 47 }).map((_, i) => {
+  const tenantAuth = TENANT_AUTH_STATUSES[i % 4];
+  return {
+    id: `T${String(202600 + i).padStart(6, "0")}`,
+    name: `${TENANT_NAMES[i % TENANT_NAMES.length]}${i > 9 ? `(${i})` : ""}`,
+    subject: i % 2 === 0 ? "个人" : "企业",
+    tenantAuth,
+    level: tenantAuth === "待认证" ? undefined : LEVELS[i % 4],
+  };
+});
+
+// 租户认证状态 → 审核单状态
+const tenantAuthToAuditStatus = (t: TenantAuth, idx: number): Status => {
+  if (t === "认证中") return idx % 2 === 0 ? "待审核" : "审核中";
+  if (t === "认证成功") return "已通过";
+  if (t === "认证失败") return "已驳回";
+  return "待审核";
+};
+
+// 渠道选择：高等级偏向人脸 / 数字证书渠道
+const pickProvider = (level: LevelKey, idx: number): ProviderId => {
+  if (level === "L3") return idx % 2 === 0 ? "alipay" : "wechat";
+  if (level === "L4") return idx % 2 === 0 ? "wechat" : "cfca";
+  if (level === "L2") return idx % 2 === 0 ? "platform" : "unionpay";
+  return idx % 2 === 0 ? "platform" : "cfca";
+};
 
 function maskId(s: string) {
   if (s.length < 8) return s;
