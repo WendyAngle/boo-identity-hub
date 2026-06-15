@@ -421,11 +421,33 @@ function AuditPage() {
   };
   const batchPass = () => {
     if (selected.size === 0) return toast.error("请先选择申请单");
-    setPassConfirm({ kind: "batch", ids: Array.from(selected) });
+    const actionable = data
+      .filter((t) => selected.has(t.id) && (t.status === "待审核" || t.status === "审核中"))
+      .map((t) => t.id);
+    const skipped = selected.size - actionable.length;
+    if (actionable.length === 0) {
+      toast.error("所选申请均不可操作（仅「待审核 / 审核中」可批量通过）");
+      return;
+    }
+    if (skipped > 0) {
+      toast.info(`已自动过滤 ${skipped} 条不可操作的申请`);
+    }
+    setPassConfirm({ kind: "batch", ids: actionable });
   };
   const batchReject = () => {
     if (selected.size === 0) return toast.error("请先选择申请单");
-    setBatchRejectConfirm(Array.from(selected));
+    const actionable = data
+      .filter((t) => selected.has(t.id) && (t.status === "待审核" || t.status === "审核中"))
+      .map((t) => t.id);
+    const skipped = selected.size - actionable.length;
+    if (actionable.length === 0) {
+      toast.error("所选申请均不可操作（仅「待审核 / 审核中」可批量驳回）");
+      return;
+    }
+    if (skipped > 0) {
+      toast.info(`已自动过滤 ${skipped} 条不可操作的申请`);
+    }
+    setBatchRejectConfirm(actionable);
   };
   const confirmPass = () => {
     if (!passConfirm) return;
@@ -447,6 +469,76 @@ function AuditPage() {
   const recheck = (t: AuditItem) => {
     toast.info(`正在重新调用「${PROVIDERS[t.provider].name}」核验通道…`);
     setTimeout(() => toast.success("核验通道已重新调用，结果将异步回传"), 800);
+  };
+
+  const exportAudits = () => {
+    const rows =
+      selected.size > 0 ? data.filter((t) => selected.has(t.id)) : filtered;
+    if (rows.length === 0) {
+      toast.error("没有可导出的数据");
+      return;
+    }
+    const headers = [
+      "申请单号",
+      "租户ID",
+      "租户名称",
+      "主体类型",
+      "申请人",
+      "认证等级",
+      "渠道",
+      "状态",
+      "提交时间",
+      "审核人",
+      "审核时间",
+      "驳回原因",
+      "第三方TraceID",
+      "第三方结论",
+      "风险分",
+    ];
+    const csvEscape = (v: unknown) => {
+      const s = String(v ?? "");
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const lines = [
+      headers.join(","),
+      ...rows.map((t) =>
+        [
+          t.id,
+          t.tenantId,
+          t.tenantName,
+          t.subject,
+          t.applicantName,
+          t.level,
+          PROVIDERS[t.provider]?.name ?? t.provider,
+          t.status,
+          t.submittedAt,
+          t.reviewer ?? "",
+          t.reviewedAt ?? "",
+          t.rejectReason ?? "",
+          t.thirdParty?.traceId ?? "",
+          t.thirdParty?.conclusion ?? "",
+          t.thirdParty?.riskScore ?? "",
+        ]
+          .map(csvEscape)
+          .join(","),
+      ),
+    ].join("\r\n");
+    const blob = new Blob(["\uFEFF" + lines], {
+      type: "text/csv;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `实名审核_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success(
+      selected.size > 0
+        ? `已导出所选 ${rows.length} 条申请`
+        : `已导出全部 ${rows.length} 条申请`,
+    );
   };
 
   return (
@@ -538,7 +630,10 @@ function AuditPage() {
           <div className="flex flex-wrap gap-2">
             <Button onClick={batchPass} disabled={selected.size === 0}><Check className="h-4 w-4" /> 批量通过</Button>
             <Button variant="outline" onClick={batchReject} disabled={selected.size === 0}><X className="h-4 w-4" /> 批量驳回</Button>
-            <Button variant="outline" onClick={() => toast.success("已导出当前筛选结果")}><Download className="h-4 w-4" /> 导出</Button>
+            <Button variant="outline" onClick={exportAudits}>
+              <Download className="h-4 w-4" />
+              {selected.size > 0 ? `导出所选 (${selected.size})` : "导出"}
+            </Button>
           </div>
         </div>
 
