@@ -397,9 +397,6 @@ function CreateLevelDialog({
   const [enterpriseDesc, setEnterpriseDesc] = useState("");
   const [enterpriseFactors, setEnterpriseFactors] = useState<string[]>([]);
 
-  // 每次打开重置
-  useState(() => undefined);
-
   const reset = () => {
     setKey(`L${existingKeys.length + 1}`);
     setTitle("");
