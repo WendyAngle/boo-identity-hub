@@ -363,7 +363,14 @@ function AuditPage() {
   const pageData = filtered.slice((page - 1) * pageSize, page * pageSize);
 
   const stats = useMemo(() => {
-    const c = (s: Status) => data.filter((d) => d.status === s).length;
+    const c = (s: Status) => {
+      const rows = data.filter((d) => d.status === s);
+      return {
+        total: rows.length,
+        personal: rows.filter((d) => d.subject === "个人").length,
+        enterprise: rows.filter((d) => d.subject === "企业").length,
+      };
+    };
     return { pending: c("待审核"), auditing: c("审核中"), passed: c("已通过"), rejected: c("已驳回") };
   }, [data]);
 
@@ -569,10 +576,10 @@ function AuditPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-        <StatCard icon={<ShieldAlert className="h-5 w-5" />} label="待审核" value={stats.pending} tone="muted" hint="等待人工接单" />
-        <StatCard icon={<Clock className="h-5 w-5" />} label="审核中" value={stats.auditing} tone="amber" hint="第三方回调中 / 人工复核中" />
-        <StatCard icon={<ShieldCheck className="h-5 w-5" />} label="已通过" value={stats.passed} tone="emerald" hint="今日 +3" />
-        <StatCard icon={<ShieldX className="h-5 w-5" />} label="已驳回" value={stats.rejected} tone="rose" hint="今日 +1" />
+        <StatCard icon={<ShieldAlert className="h-5 w-5" />} label="待审核" stat={stats.pending} tone="muted" hint="等待人工接单" />
+        <StatCard icon={<Clock className="h-5 w-5" />} label="审核中" stat={stats.auditing} tone="amber" hint="第三方回调中 / 人工复核中" />
+        <StatCard icon={<ShieldCheck className="h-5 w-5" />} label="已通过" stat={stats.passed} tone="emerald" hint="今日 +3" />
+        <StatCard icon={<ShieldX className="h-5 w-5" />} label="已驳回" stat={stats.rejected} tone="rose" hint="今日 +1" />
       </div>
 
       {/* Filter */}
@@ -870,23 +877,43 @@ function AuditPage() {
   );
 }
 
-function StatCard({ icon, label, value, tone, hint }: { icon: React.ReactNode; label: string; value: number; tone: "muted" | "amber" | "emerald" | "rose"; hint?: string }) {
+function StatCard({ icon, label, stat, tone, hint }: { icon: React.ReactNode; label: string; stat: { total: number; personal: number; enterprise: number }; tone: "muted" | "amber" | "emerald" | "rose"; hint?: string }) {
   const toneCls: Record<string, string> = {
     muted: "bg-muted text-muted-foreground",
     amber: "bg-amber-100 text-amber-700",
     emerald: "bg-emerald-100 text-emerald-700",
     rose: "bg-rose-100 text-rose-700",
   };
+  const dotCls: Record<string, string> = {
+    muted: "bg-muted-foreground/40",
+    amber: "bg-amber-500",
+    emerald: "bg-emerald-500",
+    rose: "bg-rose-500",
+  };
   return (
     <Card className="p-5">
       <div className="flex items-start justify-between">
-        <div>
+        <div className="min-w-0 flex-1">
           <div className="text-sm text-muted-foreground">{label}</div>
-          <div className="text-3xl font-bold mt-1 tabular-nums">{value}</div>
+          <div className="text-3xl font-bold mt-1 tabular-nums">{stat.total}</div>
+          <div className="mt-2 flex items-center gap-3 text-xs">
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              <UserIcon className="h-3.5 w-3.5" />
+              <span>个人</span>
+              <span className="font-semibold text-foreground tabular-nums">{stat.personal}</span>
+            </div>
+            <span className="h-3 w-px bg-border" />
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              <Building2 className="h-3.5 w-3.5" />
+              <span>企业</span>
+              <span className="font-semibold text-foreground tabular-nums">{stat.enterprise}</span>
+            </div>
+          </div>
           {hint && <div className="text-xs text-muted-foreground mt-1">{hint}</div>}
         </div>
-        <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${toneCls[tone]}`}>{icon}</div>
+        <div className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${toneCls[tone]}`}>{icon}</div>
       </div>
+      <span className={`sr-only ${dotCls[tone]}`} />
     </Card>
   );
 }
