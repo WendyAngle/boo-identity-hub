@@ -557,8 +557,45 @@ function UsersPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <UserFormDialog
+      {/* Toggle status confirm */}
+      <AlertDialog open={!!toggleTarget} onOpenChange={(o) => !o && setToggleTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              确认{toggleTarget?.status === "正常" ? "停用" : "启用"}该用户？
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              即将{toggleTarget?.status === "正常" ? "停用" : "启用"}{" "}
+              <span className="font-medium text-foreground">{toggleTarget?.name}</span>
+              （{toggleTarget?.id}）。
+              {toggleTarget?.status === "正常"
+                ? "停用后该用户将无法登录系统。"
+                : "启用后该用户可恢复登录。"}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (toggleTarget) {
+                  const next = toggleTarget.status === "正常" ? "停用" : "正常";
+                  setData((d) =>
+                    d.map((x) => (x.id === toggleTarget.id ? { ...x, status: next } : x)),
+                  );
+                  toast.success(
+                    `已${toggleTarget.status === "正常" ? "停用" : "启用"} ${toggleTarget.name}`,
+                  );
+                }
+                setToggleTarget(null);
+              }}
+            >
+              确认{toggleTarget?.status === "正常" ? "停用" : "启用"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
+      <UserFormDialog
         open={formOpen}
         onOpenChange={setFormOpen}
         editing={editing}
