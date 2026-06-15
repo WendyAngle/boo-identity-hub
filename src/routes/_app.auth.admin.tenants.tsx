@@ -97,12 +97,34 @@ interface LevelOption {
   title: string;
   personalTag: string;
   enterpriseTag: string;
+  personalFactors: string[];
+  enterpriseFactors: string[];
 }
 const LEVEL_OPTIONS: LevelOption[] = [
-  { key: "L1", title: "基础认证", personalTag: "二要素", enterpriseTag: "企业 + 法人二要素" },
-  { key: "L2", title: "三要素认证", personalTag: "三要素", enterpriseTag: "法人三要素" },
-  { key: "L3", title: "人脸核身", personalTag: "人脸核身", enterpriseTag: "企业 + 法人人脸核身" },
-  { key: "L4", title: "完整认证", personalTag: "四要素", enterpriseTag: "企业完整认证" },
+  {
+    key: "L1", title: "基础认证",
+    personalTag: "二要素", enterpriseTag: "企业 + 法人二要素",
+    personalFactors: ["姓名", "身份证号"],
+    enterpriseFactors: ["企业名称", "统一社会信用代码", "法人姓名", "法人身份证号"],
+  },
+  {
+    key: "L2", title: "三要素认证",
+    personalTag: "三要素", enterpriseTag: "法人三要素",
+    personalFactors: ["姓名", "身份证号", "手机号"],
+    enterpriseFactors: ["企业信息", "法人姓名", "法人身份证号", "法人手机号"],
+  },
+  {
+    key: "L3", title: "人脸核身",
+    personalTag: "人脸核身", enterpriseTag: "企业 + 法人人脸核身",
+    personalFactors: ["姓名", "身份证号", "手机号", "人脸识别"],
+    enterpriseFactors: ["企业信息", "营业执照", "法人三要素", "法人人脸识别"],
+  },
+  {
+    key: "L4", title: "完整认证",
+    personalTag: "四要素", enterpriseTag: "企业完整认证",
+    personalFactors: ["姓名", "身份证号", "手机号", "人脸识别", "银行卡"],
+    enterpriseFactors: ["企业信息", "营业执照", "法人四要素", "对公账户"],
+  },
 ];
 
 type AuthTiming = "首次登录" | "使用敏感功能";
