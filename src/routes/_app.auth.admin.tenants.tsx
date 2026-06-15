@@ -587,6 +587,8 @@ function TenantFormDialog({ open, onOpenChange, editing, onSubmit }: TenantFormP
     type: "企业用户",
     industry: INDUSTRIES[0],
     product: "",
+    contact: "",
+    contactPhone: "",
     coopContent: "",
     coopStatus: "合作中",
     authStatus: "待认证",
