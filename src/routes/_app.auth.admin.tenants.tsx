@@ -206,6 +206,19 @@ function TenantsPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Tenant | null>(null);
   const [policies, setPolicies] = useState<Record<string, AuthPolicy>>({});
+
+  // 初始化：除"待认证"外，其他认证状态的租户都默认带有认证策略（含等级）
+  useEffect(() => {
+    const init: Record<string, AuthPolicy> = {};
+    const levelPool: LevelKey[] = ["L1", "L2", "L3", "L4"];
+    MOCK.forEach((t, i) => {
+      if (t.authStatus !== "待认证") {
+        init[t.id] = { ...DEFAULT_POLICY, level: levelPool[i % levelPool.length] };
+      }
+    });
+    setPolicies(init);
+  }, []);
+
   const [policyTarget, setPolicyTarget] = useState<Tenant | null>(null);
 
   const filtered = useMemo(() => {
