@@ -933,18 +933,35 @@ function AuthPolicyDialog({ tenant, existing, onOpenChange, onSubmit }: AuthPoli
                 </span>
               </Label>
               <Select value={policy.level} onValueChange={(v) => set("level", v as LevelKey)}>
-                <SelectTrigger>
+                <SelectTrigger className="h-auto min-h-10 py-2">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
-                  {LEVEL_OPTIONS.map((l) => (
-                    <SelectItem key={l.key} value={l.key}>
-                      <span className="font-medium">{l.key} · {l.title}</span>
-                      <span className="ml-2 text-xs text-muted-foreground">
-                        {isPersonal ? l.personalTag : l.enterpriseTag}
-                      </span>
-                    </SelectItem>
-                  ))}
+                <SelectContent className="max-w-[--radix-select-trigger-width]">
+                  {LEVEL_OPTIONS.map((l) => {
+                    const factors = isPersonal ? l.personalFactors : l.enterpriseFactors;
+                    const tag = isPersonal ? l.personalTag : l.enterpriseTag;
+                    return (
+                      <SelectItem key={l.key} value={l.key} className="py-2.5">
+                        <div className="flex flex-col gap-1.5">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">{l.key} · {l.title}</span>
+                            <span className="text-xs text-muted-foreground">{tag}</span>
+                          </div>
+                          <div className="flex flex-wrap gap-1">
+                            {factors.map((f) => (
+                              <Badge
+                                key={f}
+                                variant="secondary"
+                                className="text-[10px] font-normal py-0 px-1.5"
+                              >
+                                {f}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
