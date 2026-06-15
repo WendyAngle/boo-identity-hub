@@ -695,6 +695,18 @@ function TenantsPage() {
       />
 
       <ImportTenantsDialog open={importOpen} onOpenChange={setImportOpen} />
+
+      <TenantDetailDialog
+        tenant={viewTarget}
+        policy={viewTarget ? policies[viewTarget.id] : undefined}
+        onOpenChange={(o) => !o && setViewTarget(null)}
+        onEditPolicy={() => {
+          if (viewTarget) {
+            setPolicyTarget(viewTarget);
+            setViewTarget(null);
+          }
+        }}
+      />
     </div>
   );
 }
