@@ -65,6 +65,16 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/_app/auth/admin/audit")({
   head: () => ({ meta: [{ title: "实名审核 | Boo数据平台" }] }),
@@ -291,6 +301,10 @@ function AuditPage() {
   const [page, setPage] = useState(1);
   const pageSize = 10;
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [passConfirm, setPassConfirm] = useState<
+    { kind: "one"; item: AuditItem } | { kind: "batch"; ids: string[] } | null
+  >(null);
+  const [batchRejectConfirm, setBatchRejectConfirm] = useState<string[] | null>(null);
   const [detail, setDetail] = useState<AuditItem | null>(null);
   const [rejectOpen, setRejectOpen] = useState(false);
   const [rejectReason, setRejectReason] = useState(REJECT_REASONS[0]);
@@ -351,6 +365,9 @@ function AuditPage() {
   };
 
   const passOne = (t: AuditItem) => {
+    setPassConfirm({ kind: "one", item: t });
+  };
+  const doPassOne = (t: AuditItem) => {
     applyDecision([t.id], "已通过");
     toast.success(`已通过 ${t.id}`);
   };
@@ -368,13 +385,27 @@ function AuditPage() {
   };
   const batchPass = () => {
     if (selected.size === 0) return toast.error("请先选择申请单");
-    applyDecision(Array.from(selected), "已通过");
-    toast.success(`批量通过 ${selected.size} 条`);
+    setPassConfirm({ kind: "batch", ids: Array.from(selected) });
   };
   const batchReject = () => {
     if (selected.size === 0) return toast.error("请先选择申请单");
-    applyDecision(Array.from(selected), "已驳回", "批量驳回 · 请补充资料");
-    toast.success(`批量驳回 ${selected.size} 条`);
+    setBatchRejectConfirm(Array.from(selected));
+  };
+  const confirmPass = () => {
+    if (!passConfirm) return;
+    if (passConfirm.kind === "one") {
+      doPassOne(passConfirm.item);
+    } else {
+      applyDecision(passConfirm.ids, "已通过");
+      toast.success(`批量通过 ${passConfirm.ids.length} 条`);
+    }
+    setPassConfirm(null);
+  };
+  const confirmBatchReject = () => {
+    if (!batchRejectConfirm) return;
+    applyDecision(batchRejectConfirm, "已驳回", "批量驳回 · 请补充资料");
+    toast.success(`批量驳回 ${batchRejectConfirm.length} 条`);
+    setBatchRejectConfirm(null);
   };
 
   const recheck = (t: AuditItem) => {
@@ -654,6 +685,52 @@ function AuditPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Pass confirmation */}
+      <AlertDialog open={!!passConfirm} onOpenChange={(o) => !o && setPassConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {passConfirm?.kind === "batch"
+                ? `确认批量通过 ${passConfirm.ids.length} 条申请？`
+                : `确认通过申请 ${passConfirm?.kind === "one" ? passConfirm.item.id : ""}？`}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {passConfirm?.kind === "batch"
+                ? "通过后将更新所选申请单的认证状态，仅对状态为「待审核 / 审核中」的申请生效，操作不可撤销。"
+                : passConfirm?.kind === "one"
+                  ? `该申请将被标记为「已通过」，申请人 ${passConfirm.item.applicantName}（${passConfirm.item.tenantName}）将收到通知，操作不可撤销。`
+                  : ""}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction className="bg-emerald-600 hover:bg-emerald-700" onClick={confirmPass}>
+              确认通过
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Batch reject confirmation */}
+      <AlertDialog open={!!batchRejectConfirm} onOpenChange={(o) => !o && setBatchRejectConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              确认批量驳回 {batchRejectConfirm?.length ?? 0} 条申请？
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              驳回原因将统一记录为「批量驳回 · 请补充资料」，仅对状态为「待审核 / 审核中」的申请生效，操作不可撤销。如需为单条申请填写具体原因，请在操作列单条驳回。
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction className="bg-rose-600 hover:bg-rose-700" onClick={confirmBatchReject}>
+              确认驳回
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
