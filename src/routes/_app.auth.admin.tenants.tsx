@@ -400,7 +400,7 @@ function TenantsPage() {
             <Button onClick={() => { setEditing(null); setFormOpen(true); }}>
               <Plus className="h-4 w-4" /> 新增租户
             </Button>
-            <Button variant="outline" onClick={() => toast.info("打开导入租户")}>
+            <Button variant="outline" onClick={() => setImportOpen(true)}>
               <Upload className="h-4 w-4" /> 导入租户
             </Button>
             <Button variant="outline" onClick={() => toast.success("已导出当前筛选结果")}>
