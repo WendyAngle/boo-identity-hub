@@ -22,6 +22,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import {
   Dialog,
   DialogContent,
@@ -572,13 +574,33 @@ function TenantFormDialog({ open, onOpenChange, editing, onSubmit }: TenantFormP
 
           <div className="space-y-1.5">
             <Label>合作状态</Label>
-            <Select value={form.coopStatus} onValueChange={(v) => set("coopStatus", v as CoopStatus)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="合作中">合作中</SelectItem>
-                <SelectItem value="终止合作">终止合作</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex h-9 items-center gap-3 rounded-md border border-input bg-background px-3">
+              <TooltipProvider delayDuration={150}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="inline-flex items-center gap-2">
+                      <Switch
+                        checked={form.coopStatus === "合作中"}
+                        onCheckedChange={(v) => set("coopStatus", v ? "合作中" : "终止合作")}
+                      />
+                      <span
+                        className={
+                          "text-sm " +
+                          (form.coopStatus === "合作中"
+                            ? "text-foreground font-medium"
+                            : "text-muted-foreground")
+                        }
+                      >
+                        {form.coopStatus}
+                      </span>
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {form.coopStatus === "合作中" ? "点击终止合作" : "点击开启合作"}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           </div>
 
           <div className="space-y-1.5">
