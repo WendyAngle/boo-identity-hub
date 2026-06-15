@@ -24,6 +24,8 @@ import {
   RefreshCcw,
   CheckCircle2,
   Activity,
+  Braces,
+  RotateCw,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
