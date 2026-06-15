@@ -316,7 +316,7 @@ function TenantsPage() {
             共 <span className="font-semibold text-foreground">{total}</span> 条租户记录
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button onClick={() => toast.info("打开新增租户表单")}>
+            <Button onClick={() => { setEditing(null); setFormOpen(true); }}>
               <Plus className="h-4 w-4" /> 新增租户
             </Button>
             <Button variant="outline" onClick={() => toast.info("打开认证策略配置")}>
