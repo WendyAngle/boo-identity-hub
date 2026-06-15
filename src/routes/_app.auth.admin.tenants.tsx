@@ -622,6 +622,30 @@ function TenantFormDialog({ open, onOpenChange, editing, onSubmit }: TenantFormP
       toast.error("请输入租户名称");
       return;
     }
+    if (!form.type) {
+      toast.error("请选择租户类型");
+      return;
+    }
+    if (!form.industry) {
+      toast.error("请选择所属行业");
+      return;
+    }
+    if (!form.product.trim()) {
+      toast.error("请输入主营产品");
+      return;
+    }
+    if (!form.contact.trim()) {
+      toast.error("请输入联系人 / 负责人");
+      return;
+    }
+    if (!/^\d{6,20}$/.test(form.contactPhone.replace(/-/g, ""))) {
+      toast.error("请输入合法的联系电话");
+      return;
+    }
+    if (!form.coopContent.trim()) {
+      toast.error("请输入合作内容");
+      return;
+    }
     onSubmit(form);
   };
 
@@ -649,7 +673,7 @@ function TenantFormDialog({ open, onOpenChange, editing, onSubmit }: TenantFormP
           </div>
 
           <div className="space-y-1.5">
-            <Label>类型</Label>
+            <Label>类型 <span className="text-destructive">*</span></Label>
             <Select value={form.type} onValueChange={(v) => set("type", v as TenantType)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
@@ -660,7 +684,7 @@ function TenantFormDialog({ open, onOpenChange, editing, onSubmit }: TenantFormP
           </div>
 
           <div className="space-y-1.5">
-            <Label>行业</Label>
+            <Label>行业 <span className="text-destructive">*</span></Label>
             <Select value={form.industry} onValueChange={(v) => set("industry", v)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
@@ -672,12 +696,12 @@ function TenantFormDialog({ open, onOpenChange, editing, onSubmit }: TenantFormP
           </div>
 
           <div className="space-y-1.5">
-            <Label>主营产品</Label>
+            <Label>主营产品 <span className="text-destructive">*</span></Label>
             <Input value={form.product} onChange={(e) => set("product", e.target.value)} placeholder="如：数据中台" />
           </div>
 
           <div className="space-y-1.5">
-            <Label>联系人 / 负责人</Label>
+            <Label>联系人 / 负责人 <span className="text-destructive">*</span></Label>
             <Input
               value={form.contact}
               onChange={(e) => set("contact", e.target.value)}
@@ -686,7 +710,7 @@ function TenantFormDialog({ open, onOpenChange, editing, onSubmit }: TenantFormP
           </div>
 
           <div className="space-y-1.5">
-            <Label>联系电话</Label>
+            <Label>联系电话 <span className="text-destructive">*</span></Label>
             <Input
               value={form.contactPhone}
               onChange={(e) => set("contactPhone", e.target.value.replace(/[^\d-]/g, ""))}
@@ -697,7 +721,7 @@ function TenantFormDialog({ open, onOpenChange, editing, onSubmit }: TenantFormP
           </div>
 
           <div className="space-y-1.5 md:col-span-2">
-            <Label>合作内容</Label>
+            <Label>合作内容 <span className="text-destructive">*</span></Label>
             <Input value={form.coopContent} onChange={(e) => set("coopContent", e.target.value)} placeholder="如：数据接入 / 联合运营" />
           </div>
 
