@@ -19,6 +19,7 @@ import { Route as AppAuthUserRouteImport } from './routes/_app.auth.user'
 import { Route as AppAuthAdminRouteImport } from './routes/_app.auth.admin'
 import { Route as AppPointsTransactionsIndexRouteImport } from './routes/_app.points.transactions.index'
 import { Route as AppAuthAdminIndexRouteImport } from './routes/_app.auth.admin.index'
+import { Route as AppPointsTransactionsPointsLedgerRouteImport } from './routes/_app.points.transactions.points-ledger'
 import { Route as AppPointsProductsRechargeRouteImport } from './routes/_app.points.products.recharge'
 import { Route as AppPointsProductsCategoriesRouteImport } from './routes/_app.points.products.categories'
 import { Route as AppPointsProductsBundlesRouteImport } from './routes/_app.points.products.bundles'
@@ -80,6 +81,12 @@ const AppAuthAdminIndexRoute = AppAuthAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppAuthAdminRoute,
 } as any)
+const AppPointsTransactionsPointsLedgerRoute =
+  AppPointsTransactionsPointsLedgerRouteImport.update({
+    id: '/points-ledger',
+    path: '/points-ledger',
+    getParentRoute: () => AppPointsTransactionsRoute,
+  } as any)
 const AppPointsProductsRechargeRoute =
   AppPointsProductsRechargeRouteImport.update({
     id: '/points/products/recharge',
@@ -152,6 +159,7 @@ export interface FileRoutesByFullPath {
   '/points/products/bundles': typeof AppPointsProductsBundlesRoute
   '/points/products/categories': typeof AppPointsProductsCategoriesRoute
   '/points/products/recharge': typeof AppPointsProductsRechargeRoute
+  '/points/transactions/points-ledger': typeof AppPointsTransactionsPointsLedgerRoute
   '/auth/admin/': typeof AppAuthAdminIndexRoute
   '/points/transactions/': typeof AppPointsTransactionsIndexRoute
 }
@@ -171,6 +179,7 @@ export interface FileRoutesByTo {
   '/points/products/bundles': typeof AppPointsProductsBundlesRoute
   '/points/products/categories': typeof AppPointsProductsCategoriesRoute
   '/points/products/recharge': typeof AppPointsProductsRechargeRoute
+  '/points/transactions/points-ledger': typeof AppPointsTransactionsPointsLedgerRoute
   '/auth/admin': typeof AppAuthAdminIndexRoute
   '/points/transactions': typeof AppPointsTransactionsIndexRoute
 }
@@ -194,6 +203,7 @@ export interface FileRoutesById {
   '/_app/points/products/bundles': typeof AppPointsProductsBundlesRoute
   '/_app/points/products/categories': typeof AppPointsProductsCategoriesRoute
   '/_app/points/products/recharge': typeof AppPointsProductsRechargeRoute
+  '/_app/points/transactions/points-ledger': typeof AppPointsTransactionsPointsLedgerRoute
   '/_app/auth/admin/': typeof AppAuthAdminIndexRoute
   '/_app/points/transactions/': typeof AppPointsTransactionsIndexRoute
 }
@@ -217,6 +227,7 @@ export interface FileRouteTypes {
     | '/points/products/bundles'
     | '/points/products/categories'
     | '/points/products/recharge'
+    | '/points/transactions/points-ledger'
     | '/auth/admin/'
     | '/points/transactions/'
   fileRoutesByTo: FileRoutesByTo
@@ -236,6 +247,7 @@ export interface FileRouteTypes {
     | '/points/products/bundles'
     | '/points/products/categories'
     | '/points/products/recharge'
+    | '/points/transactions/points-ledger'
     | '/auth/admin'
     | '/points/transactions'
   id:
@@ -258,6 +270,7 @@ export interface FileRouteTypes {
     | '/_app/points/products/bundles'
     | '/_app/points/products/categories'
     | '/_app/points/products/recharge'
+    | '/_app/points/transactions/points-ledger'
     | '/_app/auth/admin/'
     | '/_app/points/transactions/'
   fileRoutesById: FileRoutesById
@@ -337,6 +350,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth/admin/'
       preLoaderRoute: typeof AppAuthAdminIndexRouteImport
       parentRoute: typeof AppAuthAdminRoute
+    }
+    '/_app/points/transactions/points-ledger': {
+      id: '/_app/points/transactions/points-ledger'
+      path: '/points-ledger'
+      fullPath: '/points/transactions/points-ledger'
+      preLoaderRoute: typeof AppPointsTransactionsPointsLedgerRouteImport
+      parentRoute: typeof AppPointsTransactionsRoute
     }
     '/_app/points/products/recharge': {
       id: '/_app/points/products/recharge'
@@ -446,10 +466,13 @@ const AppAuthUserRouteWithChildren = AppAuthUserRoute._addFileChildren(
 )
 
 interface AppPointsTransactionsRouteChildren {
+  AppPointsTransactionsPointsLedgerRoute: typeof AppPointsTransactionsPointsLedgerRoute
   AppPointsTransactionsIndexRoute: typeof AppPointsTransactionsIndexRoute
 }
 
 const AppPointsTransactionsRouteChildren: AppPointsTransactionsRouteChildren = {
+  AppPointsTransactionsPointsLedgerRoute:
+    AppPointsTransactionsPointsLedgerRoute,
   AppPointsTransactionsIndexRoute: AppPointsTransactionsIndexRoute,
 }
 
