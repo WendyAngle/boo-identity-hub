@@ -19,6 +19,7 @@ import {
   FileSpreadsheet,
   FileDown,
   CheckCircle2,
+  KeyRound,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -170,6 +171,7 @@ function UsersPage() {
   const [data, setData] = useState<AppUser[]>(MOCK);
   const [delTarget, setDelTarget] = useState<AppUser | null>(null);
   const [toggleTarget, setToggleTarget] = useState<AppUser | null>(null);
+  const [resetTarget, setResetTarget] = useState<AppUser | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<AppUser | null>(null);
   const [viewTarget, setViewTarget] = useState<AppUser | null>(null);
@@ -611,6 +613,19 @@ function UsersPage() {
                               <Button
                                 size="sm"
                                 variant="ghost"
+                                className="text-primary hover:text-primary"
+                                onClick={() => setResetTarget(u)}
+                              >
+                                <KeyRound className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>重置密码</TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                size="sm"
+                                variant="ghost"
                                 className="text-destructive hover:text-destructive"
                                 onClick={() => setDelTarget(u)}
                               >
@@ -697,6 +712,35 @@ function UsersPage() {
               }}
             >
               确认{toggleTarget?.status === "正常" ? "停用" : "启用"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Reset password confirm */}
+      <AlertDialog open={!!resetTarget} onOpenChange={(o) => !o && setResetTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <KeyRound className="h-5 w-5 text-primary" />
+              确认重置该用户密码？
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              即将为 <span className="font-medium text-foreground">{resetTarget?.name}</span>
+              （{resetTarget?.id}）重置登录密码为系统默认初始密码，重置后用户需通过手机号/邮箱重新设置新密码后方可登录。
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (resetTarget) {
+                  toast.success(`已重置 ${resetTarget.name} 的登录密码`);
+                }
+                setResetTarget(null);
+              }}
+            >
+              确认重置
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
