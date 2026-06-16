@@ -241,7 +241,7 @@ function TenantsPage() {
   // 初始化：除"待认证"外，其他认证状态的租户都默认带有认证策略（含等级）
   useEffect(() => {
     const init: Record<string, AuthPolicy> = {};
-    MOCK.forEach((t, i) => {
+    MOCK.forEach((t) => {
       if (t.authStatus !== "待认证") {
         init[t.id] = { ...DEFAULT_POLICY, level: "L4" };
       }
