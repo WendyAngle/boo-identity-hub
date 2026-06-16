@@ -152,11 +152,7 @@ const LEVEL_META: Record<LevelKey, { title: string; tag: string; color: string }
 };
 
 const PROVIDERS: Record<ProviderId, { name: string; short: string; color: string; isThirdParty: boolean; channel: string }> = {
-  platform: { name: "平台直连", short: "B", color: "bg-gradient-to-br from-primary to-accent text-primary-foreground", isThirdParty: false, channel: "运营商三要素 / 公安一所" },
   alipay: { name: "支付宝实名", short: "支", color: "bg-blue-500 text-white", isThirdParty: true, channel: "支付宝实人认证 OpenAPI" },
-  wechat: { name: "微信支付实名", short: "微", color: "bg-green-500 text-white", isThirdParty: true, channel: "微信小程序人脸核身" },
-  unionpay: { name: "银联云闪付", short: "银", color: "bg-rose-500 text-white", isThirdParty: true, channel: "银联四要素鉴权" },
-  cfca: { name: "CFCA 数字证书", short: "C", color: "bg-amber-500 text-white", isThirdParty: true, channel: "CFCA 企业证书核验" },
 };
 
 const STATUS_BADGE: Record<Status, string> = {
@@ -204,7 +200,7 @@ const TENANT_NAMES = [
 ];
 const PERSON_NAMES = ["张伟", "王芳", "李娜", "刘洋", "陈思", "杨明", "赵磊", "黄雨", "周凯", "吴婷", "徐航", "孙悦"];
 const LEVELS: LevelKey[] = ["L1", "L2", "L3", "L4"];
-const PROVIDER_IDS: ProviderId[] = ["platform", "alipay", "wechat", "unionpay", "cfca"];
+const PROVIDER_IDS: ProviderId[] = ["alipay"];
 
 // 与"租户管理"完全一致的租户类型 / 认证状态 / 认证等级派生
 // 索引规则:
@@ -241,13 +237,8 @@ const tenantAuthToAuditStatus = (t: TenantAuth, idx: number): Status => {
   return "待审核";
 };
 
-// 渠道选择：高等级偏向人脸 / 数字证书渠道
-const pickProvider = (level: LevelKey, idx: number): ProviderId => {
-  if (level === "L3") return idx % 2 === 0 ? "alipay" : "wechat";
-  if (level === "L4") return idx % 2 === 0 ? "wechat" : "cfca";
-  if (level === "L2") return idx % 2 === 0 ? "platform" : "unionpay";
-  return idx % 2 === 0 ? "platform" : "cfca";
-};
+// 渠道：系统已收敛为仅支付宝实名
+const pickProvider = (_level: LevelKey, _idx: number): ProviderId => "alipay";
 
 function maskId(s: string) {
   if (s.length < 8) return s;
