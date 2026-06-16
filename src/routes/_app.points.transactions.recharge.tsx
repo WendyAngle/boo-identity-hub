@@ -621,7 +621,12 @@ function RechargePage() {
                         ))}
                       </div>
                     </TableCell>
-                    <TableCell className="whitespace-nowrap">{r.product}</TableCell>
+                    <TableCell className="whitespace-nowrap">
+                      <div className="flex flex-col">
+                        <span className="font-medium">{r.product}</span>
+                        <span className="font-mono text-[11px] text-muted-foreground">{r.productId} · {POINTS_MODE_LABEL[r.pointsMode]}</span>
+                      </div>
+                    </TableCell>
                     <TableCell className="whitespace-nowrap">
                       {r.type === "积分充值" ? (
                         <Badge variant="outline" className="bg-sky-50 text-sky-700 border-sky-200">
@@ -637,14 +642,24 @@ function RechargePage() {
                       ¥{r.amount.toLocaleString()}
                     </TableCell>
                     <TableCell className="text-right tabular-nums whitespace-nowrap">
-                      {r.basicPoints.toLocaleString()}
+                      <div className="flex flex-col items-end">
+                        <span className="font-medium">{r.basicPoints.toLocaleString()}</span>
+                        <span className="text-[11px] text-muted-foreground">
+                          通 {r.generalBasic.toLocaleString()} · 专 {r.proBasic.toLocaleString()}
+                        </span>
+                      </div>
                     </TableCell>
                     <TableCell
                       className={`text-right tabular-nums whitespace-nowrap font-medium ${
                         r.giftPoints > 0 ? "text-emerald-600" : "text-muted-foreground"
                       }`}
                     >
-                      {r.giftPoints > 0 ? `+${r.giftPoints.toLocaleString()}` : "+0"}
+                      <div className="flex flex-col items-end">
+                        <span>{r.giftPoints > 0 ? `+${r.giftPoints.toLocaleString()}` : "+0"}</span>
+                        <span className="text-[11px] text-muted-foreground font-normal">
+                          通 +{r.generalGift.toLocaleString()} · 专 +{r.proGift.toLocaleString()}
+                        </span>
+                      </div>
                     </TableCell>
                     <TableCell className="font-mono text-xs whitespace-nowrap">{r.expireAt}</TableCell>
                     <TableCell className="font-mono text-xs text-muted-foreground whitespace-nowrap">
