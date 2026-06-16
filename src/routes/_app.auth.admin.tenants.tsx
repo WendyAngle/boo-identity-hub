@@ -928,7 +928,7 @@ function TenantDetailDialog({ tenant, policy, onOpenChange, onEditPolicy }: Tena
                       levelInfo ? (
                         <span className="flex items-center gap-2">
                           <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
-                            {levelInfo.key} · {levelInfo.title}
+                            {levelInfo.title}
                           </Badge>
                           <span className="text-xs text-muted-foreground">
                             {levelInfo.enterpriseTag}
