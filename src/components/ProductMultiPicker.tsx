@@ -22,6 +22,8 @@ interface Props {
   value: ProductSel[];
   onChange: (v: ProductSel[]) => void;
   placeholder?: string;
+  /** 已被其它服务项占用的选项，禁止再次勾选 */
+  disabledKeys?: ProductSel[];
 }
 
 export function ProductMultiPicker({
@@ -30,6 +32,7 @@ export function ProductMultiPicker({
   value,
   onChange,
   placeholder = "请选择产品（支持多选）",
+  disabledKeys = [],
 }: Props) {
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
@@ -46,6 +49,10 @@ export function ProductMultiPicker({
 
   const isCatChecked = (c: string) => value.some((v) => v.type === "category" && v.key === c);
   const isBasicChecked = (id: string) => value.some((v) => v.type === "basic" && v.key === id);
+  const isCatDisabled = (c: string) =>
+    disabledKeys.some((v) => v.type === "category" && v.key === c);
+  const isBasicDisabled = (id: string) =>
+    disabledKeys.some((v) => v.type === "basic" && v.key === id);
 
   const toggleCat = (c: string) => {
     if (isCatChecked(c)) {
@@ -163,28 +170,35 @@ export function ProductMultiPicker({
                     <Checkbox checked={catChecked} onCheckedChange={() => toggleCat(g.name)} />
                     <Layers className="h-3.5 w-3.5 text-blue-600" />
                     <span className="text-sm font-medium flex-1">{g.name}</span>
+                    {isCatDisabled(g.name) && (
+                      <span className="text-[10px] text-amber-600 dark:text-amber-400">已设置</span>
+                    )}
                     <span className="text-xs text-muted-foreground">{g.items.length}</span>
                   </div>
                   {isExp && g.items.length > 0 && (
                     <div className="ml-7 border-l border-border/60 pl-2 space-y-0.5 pb-1">
                       {g.items.map((b) => {
                         const checked = catChecked || isBasicChecked(b.id);
+                        const disabledByOther = isBasicDisabled(b.id) || isCatDisabled(b.category);
                         return (
                           <label
                             key={b.id}
                             className={`flex items-center gap-2 px-2 py-1 rounded text-sm hover:bg-accent/50 ${
-                              catChecked ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
+                              catChecked || disabledByOther ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
                             }`}
                           >
                             <Checkbox
                               checked={checked}
-                              disabled={catChecked}
+                              disabled={catChecked || disabledByOther}
                               onCheckedChange={() => toggleBasic(b.id, b.category)}
                             />
                             <Box className="h-3.5 w-3.5 text-emerald-600" />
                             <span className="flex-1">{b.name}</span>
                             <span className="font-mono text-xs text-muted-foreground">{b.id}</span>
                             {checked && <Check className="h-3.5 w-3.5 text-primary" />}
+                            {!checked && disabledByOther && (
+                              <span className="text-[10px] text-amber-600 dark:text-amber-400">已设置</span>
+                            )}
                           </label>
                         );
                       })}
