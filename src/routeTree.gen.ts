@@ -21,7 +21,6 @@ import { Route as AppPointsTransactionsIndexRouteImport } from './routes/_app.po
 import { Route as AppAuthAdminIndexRouteImport } from './routes/_app.auth.admin.index'
 import { Route as AppPointsTransactionsRechargeRouteImport } from './routes/_app.points.transactions.recharge'
 import { Route as AppPointsTransactionsPointsLedgerRouteImport } from './routes/_app.points.transactions.points-ledger'
-import { Route as AppPointsTransactionsRechargeRouteImport } from './routes/_app.points.transactions.recharge'
 import { Route as AppPointsProductsRechargeRouteImport } from './routes/_app.points.products.recharge'
 import { Route as AppPointsProductsCategoriesRouteImport } from './routes/_app.points.products.categories'
 import { Route as AppPointsProductsBundlesRouteImport } from './routes/_app.points.products.bundles'
@@ -93,12 +92,6 @@ const AppPointsTransactionsPointsLedgerRoute =
   AppPointsTransactionsPointsLedgerRouteImport.update({
     id: '/points-ledger',
     path: '/points-ledger',
-    getParentRoute: () => AppPointsTransactionsRoute,
-  } as any)
-const AppPointsTransactionsRechargeRoute =
-  AppPointsTransactionsRechargeRouteImport.update({
-    id: '/recharge',
-    path: '/recharge',
     getParentRoute: () => AppPointsTransactionsRoute,
   } as any)
 const AppPointsProductsRechargeRoute =
