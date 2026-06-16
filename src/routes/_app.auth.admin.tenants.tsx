@@ -459,7 +459,7 @@ function TenantsPage() {
             <SelectTrigger><SelectValue placeholder="全部行业" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">全部行业</SelectItem>
-              {INDUSTRIES.map((i) => (
+              {industries.map((i) => (
                 <SelectItem key={i} value={i}>{i}</SelectItem>
               ))}
             </SelectContent>
@@ -726,6 +726,8 @@ function TenantsPage() {
         open={formOpen}
         onOpenChange={setFormOpen}
         editing={editing}
+        industries={industries}
+        onAddIndustry={addIndustry}
         onSubmit={(t) => {
           if (editing) {
             setData((d) => d.map((x) => (x.id === editing.id ? { ...t, id: editing.id } : x)));
