@@ -43,13 +43,6 @@ const menu: Root[] = [
         to: "/points/tenants",
         children: [],
       },
-      {
-        label: "业务交易",
-        children: [
-          { label: "积分流水", to: "/points/transactions/points-ledger", icon: ArrowLeftRight },
-          { label: "充值管理", to: "/points/transactions/recharge", icon: Wallet },
-        ],
-      },
     ],
   },
   {
