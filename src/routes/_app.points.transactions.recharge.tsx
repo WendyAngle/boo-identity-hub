@@ -73,7 +73,7 @@ interface AppRef {
 
 interface RechargeRow {
   id: string; // 订单编号 ORD...
-  customer: string;
+  tenant: string;
   apps: AppRef[];
   product: string; // 产品名称
   type: RechargeType;
@@ -85,9 +85,13 @@ interface RechargeRow {
   operator: string;
 }
 
-const CUSTOMERS = [
+// 与「积分管理系统 · 租户管理」保持一致的租户名称
+const TENANT_NAMES = [
   "星火短剧工作室F",
+  "星火短剧工作室E",
   "星火短剧工作室D",
+  "星火短剧工作室C",
+  "星火短剧工作室B",
   "蚂蚁集团",
   "字节跳动",
   "美团点评",
@@ -131,7 +135,7 @@ function buildMock(): RechargeRow[] {
   for (let i = 0; i < total; i++) {
     const t = new Date(base.getTime() - i * 1000 * 60 * 47 - Math.floor(rnd() * 60000));
     const type: RechargeType = rnd() < 0.45 ? "积分充值" : "套餐购买";
-    const customer = CUSTOMERS[Math.floor(rnd() * CUSTOMERS.length)];
+    const tenant = TENANT_NAMES[Math.floor(rnd() * TENANT_NAMES.length)];
     // 1-2 个关联应用
     const appCount = rnd() < 0.55 ? 2 : 1;
     const used = new Set<number>();
@@ -162,7 +166,7 @@ function buildMock(): RechargeRow[] {
     const expire = new Date(t.getFullYear() + 1, t.getMonth(), t.getDate());
     rows.push({
       id: `ORD${fmtDate(t).replace(/-/g, "")}${pad(i + 1, 4)}`,
-      customer,
+      tenant,
       apps,
       product,
       type,
