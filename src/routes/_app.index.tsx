@@ -24,7 +24,7 @@ function Home() {
       </section>
 
       <section className="grid gap-4 md:grid-cols-2">
-        <Link to="/auth/user" className="group rounded-xl border bg-card p-6 hover:border-primary hover:shadow-md transition-all">
+        <Link to="/auth/user/users" className="group rounded-xl border bg-card p-6 hover:border-primary hover:shadow-md transition-all">
           <div className="flex items-center gap-3">
             <div className="h-11 w-11 rounded-lg bg-accent flex items-center justify-center">
               <Users className="h-5 w-5 text-primary" />
