@@ -26,6 +26,7 @@ const menu: Root[] = [
         to: "/auth/user",
         children: [
           { label: "企业实名认证", to: "/auth/user/enterprise", icon: Building2 },
+          { label: "用户管理", to: "/auth/user/users", icon: UserCog },
           { label: "登录模拟", to: "/auth/user/login-sim", icon: LogIn },
         ],
       },
