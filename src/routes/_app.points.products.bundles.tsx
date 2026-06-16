@@ -485,8 +485,26 @@ function BundleFormDialog({ open, onOpenChange, editing, nextCode, categories, b
       const e = itemErr(it);
       if (e) return e;
     }
+    // 服务项之间不可重复设置同一分类或同一基础产品
+    const seen = new Map<string, number>();
+    for (let idx = 0; idx < items.length; idx++) {
+      for (const p of items[idx].products) {
+        const k = `${p.type}:${p.key}`;
+        if (seen.has(k)) {
+          const label =
+            p.type === "category"
+              ? `分类「${p.key}」`
+              : (() => {
+                  const bp = basicProducts.find((b) => b.id === p.key);
+                  return `基础产品「${bp ? `${bp.name}（${bp.id}）` : p.key}」`;
+                })();
+          return `第 ${idx + 1} 个服务项中 ${label} 已在其它服务项中设置过，请勿重复添加`;
+        }
+        seen.set(k, idx);
+      }
+    }
     return "";
-  }, [items]);
+  }, [items, basicProducts]);
 
   // 同分类与其下基础产品同时出现 → 叠加提示（不阻止保存）
   const overlapConflicts = useMemo(() => {
@@ -530,7 +548,16 @@ function BundleFormDialog({ open, onOpenChange, editing, nextCode, categories, b
   const updateItem = (id: string, patch: Partial<BundleItem>) =>
     setItems((arr) => arr.map((i) => (i.id === id ? { ...i, ...patch } : i)));
   const removeRow = (id: string) => setItems((arr) => arr.filter((i) => i.id !== id));
-  const addRow = () => setItems((arr) => [...arr, newItem()]);
+  const addRow = () => {
+    // 添加服务项前，校验已有服务项是否完整且无重复
+    const e = itemsError;
+    if (e) {
+      setTouched(true);
+      toast.error(e);
+      return;
+    }
+    setItems((arr) => [...arr, newItem()]);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -571,6 +598,9 @@ function BundleFormDialog({ open, onOpenChange, editing, nextCode, categories, b
                     basicProducts={basicProducts.map((b) => ({ id: b.id, name: b.name, category: b.category }))}
                     value={it.products}
                     onChange={(v) => updateItem(it.id, { products: v })}
+                    disabledKeys={items
+                      .filter((other) => other.id !== it.id)
+                      .flatMap((other) => other.products)}
                   />
                   <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-2 items-end">
                     <div className="space-y-1">
