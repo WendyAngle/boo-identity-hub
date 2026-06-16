@@ -179,12 +179,14 @@ function RechargeProductsPage() {
 
   const [kw, setKw] = useState("");
   const [typeFilter, setTypeFilter] = useState<"all" | TargetType>("all");
+  const [modeFilter, setModeFilter] = useState<"all" | PointsMode>("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "enabled" | "disabled">("all");
   const [applied, setApplied] = useState<{
     kw: string;
     type: "all" | TargetType;
+    mode: "all" | PointsMode;
     status: "all" | "enabled" | "disabled";
-  }>({ kw: "", type: "all", status: "all" });
+  }>({ kw: "", type: "all", mode: "all", status: "all" });
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
@@ -213,6 +215,7 @@ function RechargeProductsPage() {
           return false;
       }
       if (applied.type !== "all" && p.targetType !== applied.type) return false;
+      if (applied.mode !== "all" && p.pointsMode !== applied.mode) return false;
       if (applied.status === "enabled" && !p.enabled) return false;
       if (applied.status === "disabled" && p.enabled) return false;
       return true;
@@ -224,14 +227,15 @@ function RechargeProductsPage() {
   const pageData = filtered.slice((page - 1) * pageSize, page * pageSize);
 
   const apply = () => {
-    setApplied({ kw: kw.trim(), type: typeFilter, status: statusFilter });
+    setApplied({ kw: kw.trim(), type: typeFilter, mode: modeFilter, status: statusFilter });
     setPage(1);
   };
   const reset = () => {
     setKw("");
     setTypeFilter("all");
+    setModeFilter("all");
     setStatusFilter("all");
-    setApplied({ kw: "", type: "all", status: "all" });
+    setApplied({ kw: "", type: "all", mode: "all", status: "all" });
     setPage(1);
   };
 
