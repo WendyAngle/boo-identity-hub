@@ -28,7 +28,12 @@ function LoginSimPage() {
   };
 
   const handlePending = (currentScene: AuthTiming) => {
-    if (currentScene === timing) {
+    // 触发认证的条件：
+    // - 配置为「首次登录」：任意登录场景都会触发
+    // - 配置为「使用敏感功能」：仅当用户操作敏感功能时触发
+    const shouldTrigger =
+      timing === "first_login" ? currentScene === "first_login" : currentScene === "sensitive";
+    if (shouldTrigger) {
       toast.warning("您当前未进行认证，请先认证，待认证通过后继续使用系统");
       setTimeout(goAuthPage, 600);
     } else {
