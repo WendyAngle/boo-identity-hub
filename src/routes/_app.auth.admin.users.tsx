@@ -19,6 +19,7 @@ import {
   FileSpreadsheet,
   FileDown,
   CheckCircle2,
+  KeyRound,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -170,6 +171,7 @@ function UsersPage() {
   const [data, setData] = useState<AppUser[]>(MOCK);
   const [delTarget, setDelTarget] = useState<AppUser | null>(null);
   const [toggleTarget, setToggleTarget] = useState<AppUser | null>(null);
+  const [resetTarget, setResetTarget] = useState<AppUser | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<AppUser | null>(null);
   const [viewTarget, setViewTarget] = useState<AppUser | null>(null);
@@ -605,6 +607,19 @@ function UsersPage() {
                             <TooltipContent>
                               {u.status === "正常" ? "停用用户" : "启用用户"}
                             </TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="text-primary hover:text-primary"
+                                onClick={() => setResetTarget(u)}
+                              >
+                                <KeyRound className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>重置密码</TooltipContent>
                           </Tooltip>
                           <Tooltip>
                             <TooltipTrigger asChild>
