@@ -72,10 +72,16 @@ interface RechargeRow {
   tenant: string;
   apps: AppRef[];
   product: string; // 产品名称
+  productId: string; // 产品编号
   type: RechargeType;
   amount: number; // 充值金额(元)
   basicPoints: number;
   giftPoints: number;
+  generalBasic: number;
+  proBasic: number;
+  generalGift: number;
+  proGift: number;
+  pointsMode: RechargePointsMode; // 通用 / 专业 / 混合
   expireAt: string; // YYYY-MM-DD
   createdAt: string; // YYYY-MM-DD HH:mm:ss
   operator: string;
@@ -105,8 +111,15 @@ export const APPS: AppRef[] = [
   { name: "Hub", appId: "hub_0012" },
 ];
 
-const PRODUCTS_RECHARGE = ["10 元充值包", "100 元充值包", "500 元充值包", "1000 元充值包"];
-const PRODUCTS_BUNDLE = ["入门版", "标准版", "拓界版", "旗舰版", "test"];
+// 套餐产品的通用/专业积分拆分比例(基于产品定位人工标注)
+const BUNDLE_SPLIT: Record<string, { general: number; pro: number; mode: RechargePointsMode }> = {
+  PP00000008: { general: 0.6, pro: 0.4, mode: "mixed" },
+  PP00000007: { general: 0.5, pro: 0.5, mode: "mixed" },
+  PP00000006: { general: 0, pro: 1, mode: "professional" },
+  PP00000005: { general: 0.5, pro: 0.5, mode: "mixed" },
+  PP00000003: { general: 1, pro: 0, mode: "general" },
+  PP00000002: { general: 1, pro: 0, mode: "general" },
+};
 
 // === 套餐产品库(数据对齐「套餐产品管理 · 启用中」)===
 export interface BundleProduct {
@@ -230,7 +243,6 @@ function buildMock(): RechargeRow[] {
     const t = new Date(base.getTime() - i * 1000 * 60 * 47 - Math.floor(rnd() * 60000));
     const type: RechargeType = rnd() < 0.45 ? "积分充值" : "套餐购买";
     const tenant = TENANT_NAMES[Math.floor(rnd() * TENANT_NAMES.length)];
-    // 1-2 个关联应用
     const appCount = rnd() < 0.55 ? 2 : 1;
     const used = new Set<number>();
     const apps: AppRef[] = [];
@@ -240,33 +252,56 @@ function buildMock(): RechargeRow[] {
       used.add(idx);
       apps.push(APPS[idx]);
     }
+    let productId: string;
     let product: string;
     let amount: number;
-    let basicPoints: number;
-    let giftPoints: number;
-    if (type === "积分充值") {
-      product = PRODUCTS_RECHARGE[Math.floor(rnd() * PRODUCTS_RECHARGE.length)];
-      const cash = parseInt(product) || 10;
-      amount = cash;
-      basicPoints = cash * 10;
-      giftPoints = rnd() < 0.3 ? Math.round(basicPoints * 0.1) : 0;
+    let generalBasic = 0, proBasic = 0, generalGift = 0, proGift = 0;
+    let pointsMode: RechargePointsMode;
+
+    if (type === "套餐购买") {
+      const bp = BUNDLE_PRODUCTS[Math.floor(rnd() * BUNDLE_PRODUCTS.length)];
+      const split = BUNDLE_SPLIT[bp.id] ?? { general: 1, pro: 0, mode: "general" as RechargePointsMode };
+      productId = bp.id;
+      product = bp.name;
+      amount = bp.amount;
+      generalBasic = Math.round(bp.basicPoints * split.general);
+      proBasic = bp.basicPoints - generalBasic;
+      generalGift = Math.round(bp.giftPoints * split.general);
+      proGift = bp.giftPoints - generalGift;
+      pointsMode = split.mode;
     } else {
-      product = PRODUCTS_BUNDLE[Math.floor(rnd() * PRODUCTS_BUNDLE.length)];
-      const tier = [10, 1000, 10000, 109800, 50000][Math.floor(rnd() * 5)];
-      amount = tier;
-      basicPoints = Math.round(tier * (rnd() < 0.5 ? 1 : 0.9));
-      giftPoints = Math.round(basicPoints * (0.05 + rnd() * 0.2));
+      const rp = RECHARGE_PRODUCTS[Math.floor(rnd() * RECHARGE_PRODUCTS.length)];
+      // 在该产品任一阶梯区间内随机一个金额(取整百)
+      const tier = rp.tiers[Math.floor(rnd() * rp.tiers.length)];
+      const span = tier.max - tier.min;
+      const raw = tier.min + Math.floor(rnd() * span);
+      amount = Math.max(tier.min, Math.round(raw / 100) * 100);
+      productId = rp.id;
+      product = rp.name;
+      pointsMode = rp.pointsMode;
+      generalBasic = Math.round(amount * tier.generalRate);
+      proBasic = Math.round(amount * tier.proRate);
+      generalGift = Math.round((generalBasic * tier.generalBonus) / 100);
+      proGift = Math.round((proBasic * tier.proBonus) / 100);
     }
+    const basicPoints = generalBasic + proBasic;
+    const giftPoints = generalGift + proGift;
     const expire = new Date(t.getFullYear() + 1, t.getMonth(), t.getDate());
     rows.push({
       id: `ORD${fmtDate(t).replace(/-/g, "")}${pad(i + 1, 4)}`,
       tenant,
       apps,
       product,
+      productId,
       type,
       amount,
       basicPoints,
       giftPoints,
+      generalBasic,
+      proBasic,
+      generalGift,
+      proGift,
+      pointsMode,
       expireAt: fmtDate(expire),
       createdAt: fmtTime(t),
       operator: "admin",
