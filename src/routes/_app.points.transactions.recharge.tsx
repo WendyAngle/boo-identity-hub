@@ -71,7 +71,7 @@ export const Route = createFileRoute("/_app/points/transactions/recharge")({
 
 type RechargeType = "积分充值" | "套餐购买";
 
-interface AppRef {
+export interface AppRef {
   name: string;
   appId: string;
 }
@@ -91,7 +91,7 @@ interface RechargeRow {
 }
 
 // 与「积分管理系统 · 租户管理」保持一致的租户名称
-const TENANT_NAMES = [
+export const TENANT_NAMES = [
   "星火短剧工作室F",
   "星火短剧工作室E",
   "星火短剧工作室D",
@@ -107,7 +107,7 @@ const TENANT_NAMES = [
   "网易严选",
 ];
 
-const APPS: AppRef[] = [
+export const APPS: AppRef[] = [
   { name: "AI视频生成", appId: "ai_0004" },
   { name: "SIS", appId: "sea_0004" },
   { name: "AIMedia", appId: "aim_0007" },
@@ -118,7 +118,7 @@ const PRODUCTS_RECHARGE = ["10 元充值包", "100 元充值包", "500 元充值
 const PRODUCTS_BUNDLE = ["入门版", "标准版", "拓界版", "旗舰版", "test"];
 
 // === 套餐产品库(数据对齐「套餐产品管理 · 启用中」)===
-interface BundleProduct {
+export interface BundleProduct {
   id: string;
   name: string;
   description: string;
@@ -126,7 +126,7 @@ interface BundleProduct {
   basicPoints: number; // 基础积分(通用+专业)
   giftPoints: number; // 赠送积分(通用+专业)
 }
-const BUNDLE_PRODUCTS: BundleProduct[] = [
+export const BUNDLE_PRODUCTS: BundleProduct[] = [
   { id: "PP00000008", name: "全域旗舰版", description: "覆盖内容创作、获客、视频与数据洞察的全域旗舰套餐,通用+专业积分混合发放。", amount: 29800, basicPoints: 130000, giftPoints: 26000 },
   { id: "PP00000007", name: "拓界版", description: "SIS升级包+AI视频制作(30000) 等多模块组合,适合中大型团队。", amount: 109800, basicPoints: 110000, giftPoints: 16100 },
   { id: "PP00000006", name: "视频专业版", description: "仅 AI 视频制作分类内可用的专业积分套餐。", amount: 9800, basicPoints: 20000, giftPoints: 4000 },
@@ -136,9 +136,9 @@ const BUNDLE_PRODUCTS: BundleProduct[] = [
 ];
 
 // === 充值产品库(数据对齐「充值产品管理 · 启用中」)===
-type RechargeTargetType = "category" | "basic";
-type RechargePointsMode = "general" | "professional" | "mixed";
-interface RechargeTier {
+export type RechargeTargetType = "category" | "basic";
+export type RechargePointsMode = "general" | "professional" | "mixed";
+export interface RechargeTier {
   min: number;
   max: number;
   generalRate: number; // 1元=N通用积分
@@ -146,7 +146,7 @@ interface RechargeTier {
   proRate: number; // 1元=N专业积分
   proBonus: number; // 专业赠送%
 }
-interface RechargeProductDef {
+export interface RechargeProductDef {
   id: string;
   name: string;
   targetType: RechargeTargetType;
@@ -155,7 +155,7 @@ interface RechargeProductDef {
   remark: string;
   tiers: RechargeTier[];
 }
-const RECHARGE_PRODUCTS: RechargeProductDef[] = [
+export const RECHARGE_PRODUCTS: RechargeProductDef[] = [
   { id: "RP000008", name: "数据洞察季度通用充值", targetType: "category", targetKey: "数据洞察", pointsMode: "general", remark: "面向数据分析团队的通用积分充值,平台内任意产品可用。", tiers: [
     { min: 200, max: 1000, generalRate: 8, generalBonus: 5, proRate: 0, proBonus: 0 },
     { min: 1000, max: 5000, generalRate: 8, generalBonus: 10, proRate: 0, proBonus: 0 },
@@ -185,12 +185,12 @@ const RECHARGE_PRODUCTS: RechargeProductDef[] = [
     { min: 200, max: 1000, generalRate: 0, generalBonus: 0, proRate: 20, proBonus: 8 },
   ]},
 ];
-const POINTS_MODE_LABEL: Record<RechargePointsMode, string> = {
+export const POINTS_MODE_LABEL: Record<RechargePointsMode, string> = {
   general: "仅通用积分",
   professional: "仅专业积分",
   mixed: "混合发放",
 };
-function matchRechargeTier(p: RechargeProductDef, amount: number): RechargeTier | null {
+export function matchRechargeTier(p: RechargeProductDef, amount: number): RechargeTier | null {
   if (amount <= 0) return null;
   // 在 [min, max] 区间内匹配;若超过最大阶梯上限,沿用最后一阶梯
   for (const t of p.tiers) {
@@ -200,7 +200,7 @@ function matchRechargeTier(p: RechargeProductDef, amount: number): RechargeTier 
   if (last && amount > last.max) return last;
   return null;
 }
-function calcRechargePoints(tier: RechargeTier | null, amount: number) {
+export function calcRechargePoints(tier: RechargeTier | null, amount: number) {
   if (!tier || amount <= 0) return { basic: 0, gift: 0 };
   const basicGeneral = Math.round(amount * tier.generalRate);
   const basicPro = Math.round(amount * tier.proRate);
@@ -209,19 +209,19 @@ function calcRechargePoints(tier: RechargeTier | null, amount: number) {
   return { basic: basicGeneral + basicPro, gift: giftGeneral + giftPro };
 }
 
-function addYears(dateStr: string, years: number) {
+export function addYears(dateStr: string, years: number) {
   const d = new Date(dateStr);
   d.setFullYear(d.getFullYear() + years);
   return fmtDate(d);
 }
 
-function pad(n: number, len = 2) {
+export function pad(n: number, len = 2) {
   return String(n).padStart(len, "0");
 }
-function fmtTime(d: Date) {
+export function fmtTime(d: Date) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 }
-function fmtDate(d: Date) {
+export function fmtDate(d: Date) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
@@ -287,7 +287,7 @@ function buildMock(): RechargeRow[] {
 const MOCK = buildMock();
 
 // === 新增充值 向导 · 租户模拟数据 ===
-interface WizardTenant {
+export interface WizardTenant {
   id: string;
   name: string;
   contact: string;
@@ -301,7 +301,7 @@ interface WizardTenant {
 
 const W_CONTACTS = ["li", "jack", "rose", "刘德华", "刘一", "张伟", "王芳", "陈晓"];
 const W_PARTNERS = ["星火短剧工作室", "广东分公司总代", "华东渠道商", "西南渠道商", "直营"];
-function buildWizardTenants(): WizardTenant[] {
+export function buildWizardTenants(): WizardTenant[] {
   return Array.from({ length: 22 }).map((_, i) => {
     const name = TENANT_NAMES[i % TENANT_NAMES.length] + (i >= TENANT_NAMES.length ? `(${i})` : "");
     const phone = "1" + String(38452487968 + i * 731).slice(0, 10);
@@ -324,7 +324,7 @@ function buildWizardTenants(): WizardTenant[] {
   });
 }
 
-function Stepper({
+export function Stepper({
   current,
   steps,
 }: {
