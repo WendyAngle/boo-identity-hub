@@ -204,7 +204,7 @@ function RechargeNewPage() {
   };
 
   return (
-    <div className="p-8 pb-24 space-y-6">
+    <div className="p-8 space-y-6">
       {/* 面包屑 */}
       <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
         <span>积分管理系统</span>
@@ -767,8 +767,8 @@ function RechargeNewPage() {
         )}
       </Card>
 
-      {/* 底部操作栏(吸底) */}
-      <div className="fixed bottom-0 left-[var(--sidebar-width,16rem)] right-0 border-t bg-card/95 backdrop-blur px-8 py-3 flex items-center justify-between z-10">
+      {/* 底部操作栏 */}
+      <Card className="px-6 py-3 flex items-center justify-between sticky bottom-4 shadow-md">
         <div>
           {wizardStep > 1 && (
             <Button variant="outline" onClick={prevStep}>
@@ -794,7 +794,7 @@ function RechargeNewPage() {
             </Button>
           )}
         </div>
-      </div>
+      </Card>
     </div>
   );
 }
