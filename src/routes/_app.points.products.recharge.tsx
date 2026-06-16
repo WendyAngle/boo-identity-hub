@@ -10,6 +10,9 @@ import {
   Trash2,
   Layers,
   Sparkles,
+  Coins,
+  Gem,
+  Info,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -76,13 +79,18 @@ export const Route = createFileRoute("/_app/points/products/recharge")({
 });
 
 type TargetType = "category" | "basic";
+type PointsMode = "general" | "professional" | "mixed";
 
 interface Tier {
   id: string;
   minAmount: string;
   maxAmount: string;
-  pointRate: string; // 1 元 = N 基础积分
-  bonusRate: string; // 赠送比例 %
+  // 通用积分
+  generalRate: string; // 1 元 = N 通用积分
+  generalBonus: string; // 通用赠送 %
+  // 专业积分
+  proRate: string; // 1 元 = N 专业积分
+  proBonus: string; // 专业赠送 %
 }
 
 interface RechargeProduct {
@@ -90,6 +98,7 @@ interface RechargeProduct {
   name: string;
   targetType: TargetType;
   targetKey: string; // 分类名 或 基础产品 id
+  pointsMode: PointsMode;
   remark: string;
   enabled: boolean;
   tiers: Tier[];
@@ -114,10 +123,18 @@ function newTier(): Tier {
     id: Math.random().toString(36).slice(2, 9),
     minAmount: "",
     maxAmount: "",
-    pointRate: "",
-    bonusRate: "",
+    generalRate: "",
+    generalBonus: "",
+    proRate: "",
+    proBonus: "",
   };
 }
+
+const POINTS_MODE_LABEL: Record<PointsMode, string> = {
+  general: "仅通用积分",
+  professional: "仅专业积分",
+  mixed: "混合发放",
+};
 
 const INITIAL_RECHARGE: RechargeProduct[] = [
   {
@@ -125,12 +142,13 @@ const INITIAL_RECHARGE: RechargeProduct[] = [
     name: "AI视频制作充值套餐",
     targetType: "category",
     targetKey: "AI视频制作",
+    pointsMode: "mixed",
     remark: "面向视频团队的阶梯充值方案,金额越大赠送越多。",
     enabled: true,
     tiers: [
-      { id: "t1", minAmount: "100", maxAmount: "500", pointRate: "10", bonusRate: "5" },
-      { id: "t2", minAmount: "500", maxAmount: "2000", pointRate: "10", bonusRate: "10" },
-      { id: "t3", minAmount: "2000", maxAmount: "10000", pointRate: "10", bonusRate: "20" },
+      { id: "t1", minAmount: "100", maxAmount: "500", generalRate: "5", generalBonus: "5", proRate: "10", proBonus: "10" },
+      { id: "t2", minAmount: "500", maxAmount: "2000", generalRate: "5", generalBonus: "8", proRate: "10", proBonus: "15" },
+      { id: "t3", minAmount: "2000", maxAmount: "10000", generalRate: "5", generalBonus: "12", proRate: "10", proBonus: "25" },
     ],
     createdAt: "2026-03-12 09:30:14",
   },
@@ -139,11 +157,12 @@ const INITIAL_RECHARGE: RechargeProduct[] = [
     name: "AI文生图体验充值",
     targetType: "basic",
     targetKey: "BP000043",
+    pointsMode: "professional",
     remark: "针对单一基础产品的体验充值。",
     enabled: true,
     tiers: [
-      { id: "t1", minAmount: "50", maxAmount: "200", pointRate: "20", bonusRate: "0" },
-      { id: "t2", minAmount: "200", maxAmount: "1000", pointRate: "20", bonusRate: "8" },
+      { id: "t1", minAmount: "50", maxAmount: "200", generalRate: "", generalBonus: "", proRate: "20", proBonus: "0" },
+      { id: "t2", minAmount: "200", maxAmount: "1000", generalRate: "", generalBonus: "", proRate: "20", proBonus: "8" },
     ],
     createdAt: "2026-03-10 16:08:22",
   },
@@ -160,12 +179,14 @@ function RechargeProductsPage() {
 
   const [kw, setKw] = useState("");
   const [typeFilter, setTypeFilter] = useState<"all" | TargetType>("all");
+  const [modeFilter, setModeFilter] = useState<"all" | PointsMode>("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "enabled" | "disabled">("all");
   const [applied, setApplied] = useState<{
     kw: string;
     type: "all" | TargetType;
+    mode: "all" | PointsMode;
     status: "all" | "enabled" | "disabled";
-  }>({ kw: "", type: "all", status: "all" });
+  }>({ kw: "", type: "all", mode: "all", status: "all" });
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
@@ -194,6 +215,7 @@ function RechargeProductsPage() {
           return false;
       }
       if (applied.type !== "all" && p.targetType !== applied.type) return false;
+      if (applied.mode !== "all" && p.pointsMode !== applied.mode) return false;
       if (applied.status === "enabled" && !p.enabled) return false;
       if (applied.status === "disabled" && p.enabled) return false;
       return true;
@@ -205,14 +227,15 @@ function RechargeProductsPage() {
   const pageData = filtered.slice((page - 1) * pageSize, page * pageSize);
 
   const apply = () => {
-    setApplied({ kw: kw.trim(), type: typeFilter, status: statusFilter });
+    setApplied({ kw: kw.trim(), type: typeFilter, mode: modeFilter, status: statusFilter });
     setPage(1);
   };
   const reset = () => {
     setKw("");
     setTypeFilter("all");
+    setModeFilter("all");
     setStatusFilter("all");
-    setApplied({ kw: "", type: "all", status: "all" });
+    setApplied({ kw: "", type: "all", mode: "all", status: "all" });
     setPage(1);
   };
 
@@ -284,7 +307,7 @@ function RechargeProductsPage() {
       </section>
 
       <Card className="p-5">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
           <div className="relative">
             <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -303,6 +326,17 @@ function RechargeProductsPage() {
               <SelectItem value="all">全部目标类型</SelectItem>
               <SelectItem value="category">按产品分类</SelectItem>
               <SelectItem value="basic">按基础产品</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={modeFilter} onValueChange={(v) => setModeFilter(v as typeof modeFilter)}>
+            <SelectTrigger>
+              <SelectValue placeholder="积分模式" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">全部积分模式</SelectItem>
+              <SelectItem value="general">仅通用积分</SelectItem>
+              <SelectItem value="professional">仅专业积分</SelectItem>
+              <SelectItem value="mixed">混合发放</SelectItem>
             </SelectContent>
           </Select>
           <Select
@@ -378,6 +412,7 @@ function RechargeProductsPage() {
                 <TableHead>充值产品名称</TableHead>
                 <TableHead className="whitespace-nowrap">目标类型</TableHead>
                 <TableHead>目标对象</TableHead>
+                <TableHead className="whitespace-nowrap">积分模式</TableHead>
                 <TableHead className="text-right whitespace-nowrap">阶梯数</TableHead>
                 <TableHead className="whitespace-nowrap">启用状态</TableHead>
                 <TableHead className="whitespace-nowrap">创建时间</TableHead>
@@ -387,7 +422,7 @@ function RechargeProductsPage() {
             <TableBody>
               {pageData.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-12 text-muted-foreground">
+                  <TableCell colSpan={10} className="text-center py-12 text-muted-foreground">
                     暂无匹配的充值产品
                   </TableCell>
                 </TableRow>
@@ -414,6 +449,21 @@ function RechargeProductsPage() {
                       )}
                     </TableCell>
                     <TableCell className="text-muted-foreground">{targetLabel(p)}</TableCell>
+                    <TableCell>
+                      {p.pointsMode === "general" ? (
+                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
+                          <Coins className="h-3 w-3 mr-1" /> 仅通用
+                        </Badge>
+                      ) : p.pointsMode === "professional" ? (
+                        <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-900">
+                          <Gem className="h-3 w-3 mr-1" /> 仅专业
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900">
+                          <Sparkles className="h-3 w-3 mr-1" /> 混合发放
+                        </Badge>
+                      )}
+                    </TableCell>
                     <TableCell className="text-right tabular-nums">{p.tiers.length}</TableCell>
                     <TableCell>
                       <TooltipProvider delayDuration={150}>
@@ -603,6 +653,7 @@ function RechargeFormDialog({
   const [name, setName] = useState("");
   const [targetType, setTargetType] = useState<TargetType>("category");
   const [targetKey, setTargetKey] = useState("");
+  const [pointsMode, setPointsMode] = useState<PointsMode>("mixed");
   const [remark, setRemark] = useState("");
   const [enabled, setEnabled] = useState(true);
   const [tiers, setTiers] = useState<Tier[]>([newTier()]);
@@ -626,6 +677,7 @@ function RechargeFormDialog({
       setName(editing?.name ?? "");
       setTargetType(editing?.targetType ?? "category");
       setTargetKey(editing?.targetKey ?? "");
+      setPointsMode(editing?.pointsMode ?? "mixed");
       setRemark(editing?.remark ?? "");
       setEnabled(editing ? editing.enabled : true);
       setTiers(editing?.tiers.length ? editing.tiers : [newTier()]);
@@ -639,15 +691,26 @@ function RechargeFormDialog({
     setTargetKey("");
   };
 
+  const needGeneral = pointsMode === "general" || pointsMode === "mixed";
+  const needPro = pointsMode === "professional" || pointsMode === "mixed";
+
   const tierErr = (t: Tier): string => {
     if (t.minAmount === "" || Number.isNaN(Number(t.minAmount)) || Number(t.minAmount) < 0)
       return "请输入有效起始金额";
     if (t.maxAmount === "" || Number.isNaN(Number(t.maxAmount)) || Number(t.maxAmount) <= Number(t.minAmount))
       return "止金额需大于起金额";
-    if (t.pointRate === "" || !/^\d+(\.\d+)?$/.test(t.pointRate) || Number(t.pointRate) <= 0)
-      return "请输入有效的转换比例";
-    if (t.bonusRate === "" || Number.isNaN(Number(t.bonusRate)) || Number(t.bonusRate) < 0)
-      return "请输入有效的赠送比例";
+    if (needGeneral) {
+      if (t.generalRate === "" || !/^\d+(\.\d+)?$/.test(t.generalRate) || Number(t.generalRate) <= 0)
+        return "请输入有效的通用积分转换比例";
+      if (t.generalBonus === "" || Number.isNaN(Number(t.generalBonus)) || Number(t.generalBonus) < 0)
+        return "请输入有效的通用积分赠送比例";
+    }
+    if (needPro) {
+      if (t.proRate === "" || !/^\d+(\.\d+)?$/.test(t.proRate) || Number(t.proRate) <= 0)
+        return "请输入有效的专业积分转换比例";
+      if (t.proBonus === "" || Number.isNaN(Number(t.proBonus)) || Number(t.proBonus) < 0)
+        return "请输入有效的专业积分赠送比例";
+    }
     return "";
   };
 
@@ -658,7 +721,8 @@ function RechargeFormDialog({
       if (e) return e;
     }
     return "";
-  }, [tiers]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tiers, pointsMode]);
 
   const errors = {
     name: !name.trim() ? "请输入充值产品名称" : "",
@@ -673,6 +737,7 @@ function RechargeFormDialog({
       name: name.trim(),
       targetType,
       targetKey,
+      pointsMode,
       remark: remark.trim(),
       enabled,
       tiers: tiers.map((t) => ({ ...t })),
@@ -847,35 +912,100 @@ function RechargeFormDialog({
             </div>
           </FormRow>
 
+          <FormRow label="积分发放模式" required>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <TypeCard
+                active={pointsMode === "general"}
+                icon={<Coins className="h-4 w-4" />}
+                title="仅通用积分"
+                desc="充值仅产生通用积分,可在全平台已启用的基础产品间通用"
+                onClick={() => setPointsMode("general")}
+              />
+              <TypeCard
+                active={pointsMode === "professional"}
+                icon={<Gem className="h-4 w-4" />}
+                title="仅专业积分"
+                desc="充值仅产生专业积分,仅限本充值产品目标对象范围内抵扣"
+                onClick={() => setPointsMode("professional")}
+              />
+              <TypeCard
+                active={pointsMode === "mixed"}
+                icon={<Sparkles className="h-4 w-4" />}
+                title="混合发放"
+                desc="一次充值同时产生通用积分与专业积分,运营策略更灵活"
+                onClick={() => setPointsMode("mixed")}
+              />
+            </div>
+            <p className="mt-2 text-xs text-muted-foreground flex items-start gap-1.5">
+              <Info className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+              专业积分的使用范围跟随上方「目标对象」,无需单独设置。
+            </p>
+            {targetType === "basic" && pointsMode === "general" && (
+              <div className="mt-2 rounded-md border border-amber-300/60 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/30 px-3 py-2 text-xs text-amber-800 dark:text-amber-300 flex items-start gap-1.5">
+                <Info className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                当前充值产品销售范围被限制在单一基础产品,但发放的通用积分可在任意已启用产品使用,请确认是否符合预期。
+              </div>
+            )}
+          </FormRow>
+
           <FormRow label="阶梯设置" required error={touched ? errors.tiers : ""}>
             <div className="rounded-lg border overflow-hidden">
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/40">
-                    <TableHead className="w-14">阶梯</TableHead>
-                    <TableHead className="whitespace-nowrap">充值金额起(元 ≥)</TableHead>
-                    <TableHead className="whitespace-nowrap">充值金额止(元 &lt;)</TableHead>
-                    <TableHead className="whitespace-nowrap">转换比例(1元 = N积分)</TableHead>
-                    <TableHead className="whitespace-nowrap">赠送比例(%)</TableHead>
-                    <TableHead className="whitespace-nowrap">基础积分预览</TableHead>
-                    <TableHead className="whitespace-nowrap">赠送积分预览</TableHead>
-                    <TableHead className="whitespace-nowrap">合计积分预览</TableHead>
-                    <TableHead className="w-12"></TableHead>
+                    <TableHead rowSpan={2} className="w-14 align-middle">阶梯</TableHead>
+                    <TableHead rowSpan={2} className="whitespace-nowrap align-middle">充值金额起(元 ≥)</TableHead>
+                    <TableHead rowSpan={2} className="whitespace-nowrap align-middle">充值金额止(元 &lt;)</TableHead>
+                    {needGeneral && (
+                      <TableHead colSpan={2} className="text-center whitespace-nowrap border-l">
+                        <span className="inline-flex items-center gap-1 text-blue-700 dark:text-blue-300">
+                          <Coins className="h-3.5 w-3.5" /> 通用积分
+                        </span>
+                      </TableHead>
+                    )}
+                    {needPro && (
+                      <TableHead colSpan={2} className="text-center whitespace-nowrap border-l">
+                        <span className="inline-flex items-center gap-1 text-purple-700 dark:text-purple-300">
+                          <Gem className="h-3.5 w-3.5" /> 专业积分
+                        </span>
+                      </TableHead>
+                    )}
+                    <TableHead rowSpan={2} className="whitespace-nowrap align-middle border-l">合计预览</TableHead>
+                    <TableHead rowSpan={2} className="w-12 align-middle"></TableHead>
+                  </TableRow>
+                  <TableRow className="bg-muted/40">
+                    {needGeneral && (
+                      <>
+                        <TableHead className="whitespace-nowrap border-l">转换(1元=N)</TableHead>
+                        <TableHead className="whitespace-nowrap">赠送(%)</TableHead>
+                      </>
+                    )}
+                    {needPro && (
+                      <>
+                        <TableHead className="whitespace-nowrap border-l">转换(1元=N)</TableHead>
+                        <TableHead className="whitespace-nowrap">赠送(%)</TableHead>
+                      </>
+                    )}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {tiers.map((t, idx) => {
                     const minA = Number(t.minAmount) || 0;
                     const maxA = Number(t.maxAmount) || 0;
-                    const rate = Number(t.pointRate) || 0;
-                    const bonus = Number(t.bonusRate) || 0;
-                    const baseMin = Math.floor(minA * rate);
-                    const baseMax = Math.floor(maxA * rate);
-                    const bonusMin = Math.floor((baseMin * bonus) / 100);
-                    const bonusMax = Math.floor((baseMax * bonus) / 100);
-                    const totalMin = baseMin + bonusMin;
-                    const totalMax = baseMax + bonusMax;
-                    const range = (a: number, b: number) =>
+                    const gRate = needGeneral ? Number(t.generalRate) || 0 : 0;
+                    const gBonus = needGeneral ? Number(t.generalBonus) || 0 : 0;
+                    const pRate = needPro ? Number(t.proRate) || 0 : 0;
+                    const pBonus = needPro ? Number(t.proBonus) || 0 : 0;
+                    const calc = (amt: number) => {
+                      const gBase = Math.floor(amt * gRate);
+                      const gGift = Math.floor((gBase * gBonus) / 100);
+                      const pBase = Math.floor(amt * pRate);
+                      const pGift = Math.floor((pBase * pBonus) / 100);
+                      return { g: gBase + gGift, p: pBase + pGift, total: gBase + gGift + pBase + pGift };
+                    };
+                    const lo = calc(minA);
+                    const hi = calc(maxA);
+                    const fmt = (a: number, b: number) =>
                       a === b ? a.toLocaleString() : `${a.toLocaleString()} ~ ${b.toLocaleString()}`;
                     return (
                       <TableRow key={t.id}>
@@ -887,7 +1017,7 @@ function RechargeFormDialog({
                             step="0.01"
                             value={t.minAmount}
                             onChange={(e) => updateTier(t.id, { minAmount: e.target.value })}
-                            className="w-28"
+                            className="w-24"
                           />
                         </TableCell>
                         <TableCell>
@@ -897,37 +1027,67 @@ function RechargeFormDialog({
                             step="0.01"
                             value={t.maxAmount}
                             onChange={(e) => updateTier(t.id, { maxAmount: e.target.value })}
-                            className="w-28"
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Input
-                            type="number"
-                            min={0}
-                            step="0.01"
-                            value={t.pointRate}
-                            onChange={(e) => updateTier(t.id, { pointRate: e.target.value })}
-                            className="w-28"
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Input
-                            type="number"
-                            min={0}
-                            step="0.1"
-                            value={t.bonusRate}
-                            onChange={(e) => updateTier(t.id, { bonusRate: e.target.value })}
                             className="w-24"
                           />
                         </TableCell>
-                        <TableCell className="tabular-nums text-muted-foreground">
-                          {range(baseMin, baseMax)}
-                        </TableCell>
-                        <TableCell className="tabular-nums text-muted-foreground">
-                          {range(bonusMin, bonusMax)}
-                        </TableCell>
-                        <TableCell className="tabular-nums font-medium text-primary">
-                          {range(totalMin, totalMax)}
+                        {needGeneral && (
+                          <>
+                            <TableCell className="border-l">
+                              <Input
+                                type="number"
+                                min={0}
+                                step="0.01"
+                                value={t.generalRate}
+                                onChange={(e) => updateTier(t.id, { generalRate: e.target.value })}
+                                className="w-20"
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Input
+                                type="number"
+                                min={0}
+                                step="0.1"
+                                value={t.generalBonus}
+                                onChange={(e) => updateTier(t.id, { generalBonus: e.target.value })}
+                                className="w-20"
+                              />
+                            </TableCell>
+                          </>
+                        )}
+                        {needPro && (
+                          <>
+                            <TableCell className="border-l">
+                              <Input
+                                type="number"
+                                min={0}
+                                step="0.01"
+                                value={t.proRate}
+                                onChange={(e) => updateTier(t.id, { proRate: e.target.value })}
+                                className="w-20"
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Input
+                                type="number"
+                                min={0}
+                                step="0.1"
+                                value={t.proBonus}
+                                onChange={(e) => updateTier(t.id, { proBonus: e.target.value })}
+                                className="w-20"
+                              />
+                            </TableCell>
+                          </>
+                        )}
+                        <TableCell className="tabular-nums border-l">
+                          <div className="flex flex-col gap-0.5 text-xs">
+                            {needGeneral && (
+                              <span className="text-blue-700 dark:text-blue-300">通用 {fmt(lo.g, hi.g)}</span>
+                            )}
+                            {needPro && (
+                              <span className="text-purple-700 dark:text-purple-300">专业 {fmt(lo.p, hi.p)}</span>
+                            )}
+                            <span className="font-medium text-primary">合计 {fmt(lo.total, hi.total)}</span>
+                          </div>
                         </TableCell>
                         <TableCell>
                           <Button
@@ -949,7 +1109,7 @@ function RechargeFormDialog({
             </div>
             <div className="mt-2 flex items-center justify-between">
               <p className="text-xs text-muted-foreground">
-                预览根据「充值金额 × 转换比例 = 基础积分」「基础积分 × 赠送比例% = 赠送积分」实时计算
+                预览根据「充值金额 × 转换比例 = 基础积分」「基础积分 × 赠送% = 赠送积分」实时计算,合计为通用与专业之和。
               </p>
               <Button type="button" variant="ghost" size="sm" className="text-primary" onClick={addTier}>
                 <Plus className="h-4 w-4" /> 添加阶梯
