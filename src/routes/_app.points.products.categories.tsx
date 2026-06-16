@@ -54,6 +54,7 @@ interface Category {
   name: string;
   remark: string;
   createdAt: string;
+  enabled: boolean;
 }
 
 const REMARK_MAX = 200;
@@ -84,6 +85,7 @@ const INITIAL_DATA: Category[] = INITIAL_NAMES.map((name, i) => ({
   name,
   remark: INITIAL_REMARKS[i] ?? "",
   createdAt: `2026-0${(i % 6) + 1}-${String(((i * 7) % 27) + 1).padStart(2, "0")}`,
+  enabled: true,
 }));
 
 function CategoriesPage() {
@@ -207,6 +209,7 @@ function CategoriesPage() {
                 <TableHead>产品分类名称</TableHead>
                 <TableHead className="whitespace-nowrap">产品分类编码</TableHead>
                 <TableHead>备注</TableHead>
+                <TableHead className="whitespace-nowrap">启用状态</TableHead>
                 <TableHead className="whitespace-nowrap">创建时间</TableHead>
                 <TableHead className="text-right whitespace-nowrap w-32">操作</TableHead>
               </TableRow>
@@ -214,7 +217,7 @@ function CategoriesPage() {
             <TableBody>
               {pageData.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-12 text-muted-foreground">
+                  <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
                     暂无匹配的产品分类
                   </TableCell>
                 </TableRow>
@@ -227,6 +230,30 @@ function CategoriesPage() {
                       <div className="truncate" title={c.remark}>
                         {c.remark || <span className="text-xs">—</span>}
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      <TooltipProvider delayDuration={150}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              type="button"
+                              role="switch"
+                              aria-checked={c.enabled}
+                              onClick={() => toggleEnabled(c)}
+                              className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                                c.enabled ? "bg-primary" : "bg-input"
+                              }`}
+                            >
+                              <span
+                                className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-background shadow ring-0 transition-transform ${
+                                  c.enabled ? "translate-x-4" : "translate-x-0.5"
+                                }`}
+                              />
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent>{c.enabled ? "点击停用" : "点击启用"}</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </TableCell>
                     <TableCell className="font-mono text-xs text-muted-foreground tabular-nums">
                       {c.createdAt}
