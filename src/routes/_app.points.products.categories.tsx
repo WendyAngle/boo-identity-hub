@@ -280,28 +280,18 @@ function CategoriesPage() {
         open={formOpen}
         onOpenChange={setFormOpen}
         editing={editing}
-        nextCode={genCode(seq + 1)}
+        nextCode={productCategoriesStore.nextCode()}
         onSubmit={(values) => {
           if (editing) {
-            setData((d) =>
-              d.map((x) =>
-                x.id === editing.id
-                  ? { ...x, name: values.name, remark: values.remark, enabled: values.enabled }
-                  : x,
-              ),
-            );
+            productCategoriesStore.update(editing.id, {
+              name: values.name,
+              remark: values.remark,
+              enabled: values.enabled,
+            });
             toast.success(`已更新 ${values.name}`);
           } else {
-            const nextSeq = seq + 1;
-            const id = genCode(nextSeq);
-            const today = new Date();
-            const createdAt = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-            setData((d) => [
-              { id, name: values.name, remark: values.remark, createdAt, enabled: values.enabled },
-              ...d,
-            ]);
-            setSeq(nextSeq);
-            toast.success(`已新增 ${values.name}(${id})`);
+            const created = productCategoriesStore.add(values);
+            toast.success(`已新增 ${created.name}(${created.id})`);
           }
           setFormOpen(false);
         }}
@@ -321,7 +311,7 @@ function CategoriesPage() {
             <AlertDialogAction
               onClick={() => {
                 if (delTarget) {
-                  setData((d) => d.filter((x) => x.id !== delTarget.id));
+                  productCategoriesStore.remove(delTarget.id);
                   toast.success(`已删除 ${delTarget.name}`);
                 }
                 setDelTarget(null);
