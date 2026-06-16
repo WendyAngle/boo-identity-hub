@@ -117,40 +117,96 @@ const APPS: AppRef[] = [
 const PRODUCTS_RECHARGE = ["10 元充值包", "100 元充值包", "500 元充值包", "1000 元充值包"];
 const PRODUCTS_BUNDLE = ["入门版", "标准版", "拓界版", "旗舰版", "test"];
 
-// === 套餐产品库(高保真,字段对齐「套餐产品管理」)===
+// === 套餐产品库(数据对齐「套餐产品管理 · 启用中」)===
 interface BundleProduct {
   id: string;
   name: string;
   description: string;
-  amount: number; // 充值金额(元)
-  basicPoints: number;
-  giftPoints: number;
+  amount: number; // 套餐现金价(元)
+  basicPoints: number; // 基础积分(通用+专业)
+  giftPoints: number; // 赠送积分(通用+专业)
 }
 const BUNDLE_PRODUCTS: BundleProduct[] = [
-  { id: "BD0001", name: "test", description: "11", amount: 10, basicPoints: 10, giftPoints: 10 },
-  { id: "BD0002", name: "基石版", description: "SIS基础包 + AI视频制作(12000积分) + AI智能获客(12000积分)", amount: 69800, basicPoints: 20000, giftPoints: 4000 },
-  { id: "BD0003", name: "拓界版", description: "SIS升级包 + AI视频制作(36000积分) + AI智能获客(36000积分)", amount: 109800, basicPoints: 110000, giftPoints: 16100 },
-  { id: "BD0004", name: "旗舰版", description: "SIS旗舰包 + AI视频制作(80000积分) + AI智能获客(80000积分) + 专属客服", amount: 199800, basicPoints: 220000, giftPoints: 44000 },
+  { id: "PP00000008", name: "全域旗舰版", description: "覆盖内容创作、获客、视频与数据洞察的全域旗舰套餐,通用+专业积分混合发放。", amount: 29800, basicPoints: 130000, giftPoints: 26000 },
+  { id: "PP00000007", name: "拓界版", description: "SIS升级包+AI视频制作(30000) 等多模块组合,适合中大型团队。", amount: 109800, basicPoints: 110000, giftPoints: 16100 },
+  { id: "PP00000006", name: "视频专业版", description: "仅 AI 视频制作分类内可用的专业积分套餐。", amount: 9800, basicPoints: 20000, giftPoints: 4000 },
+  { id: "PP00000005", name: "基石版", description: "SIS基础包+AI视频制作(10000) 入门组合,覆盖核心场景。", amount: 69800, basicPoints: 20000, giftPoints: 4000 },
+  { id: "PP00000003", name: "通用积分包·标准版", description: "面向全平台的通用积分,锁定 AI 图生视频销售入口。", amount: 1999, basicPoints: 10000, giftPoints: 1500 },
+  { id: "PP00000002", name: "数据洞察季度通用包", description: "面向数据团队的通用积分季度包,可在全平台已启用产品消费。", amount: 5999, basicPoints: 30000, giftPoints: 6000 },
 ];
 
-// === 充值产品分类 + 阶梯赠送规则 ===
-interface RechargeCategory {
+// === 充值产品库(数据对齐「充值产品管理 · 启用中」)===
+type RechargeTargetType = "category" | "basic";
+type RechargePointsMode = "general" | "professional" | "mixed";
+interface RechargeTier {
+  min: number;
+  max: number;
+  generalRate: number; // 1元=N通用积分
+  generalBonus: number; // 通用赠送%
+  proRate: number; // 1元=N专业积分
+  proBonus: number; // 专业赠送%
+}
+interface RechargeProductDef {
   id: string;
   name: string;
-  ratio: number; // 基础积分转化比例(%), 100 = 1元=1积分
-  tiers: { min: number; gift: number }[]; // gift = 赠送比例(%)
+  targetType: RechargeTargetType;
+  targetKey: string;
+  pointsMode: RechargePointsMode;
+  remark: string;
+  tiers: RechargeTier[];
 }
-const RECHARGE_CATEGORIES: RechargeCategory[] = [
-  { id: "CT01", name: "AI视频制作", ratio: 100, tiers: [{ min: 100, gift: 5 }, { min: 1000, gift: 10 }, { min: 5000, gift: 30 }, { min: 50000, gift: 35 }] },
-  { id: "CT02", name: "AI智能获客", ratio: 100, tiers: [{ min: 100, gift: 5 }, { min: 1000, gift: 15 }, { min: 10000, gift: 25 }] },
-  { id: "CT03", name: "AI内容创作", ratio: 100, tiers: [{ min: 100, gift: 8 }, { min: 2000, gift: 18 }, { min: 20000, gift: 28 }] },
-  { id: "CT04", name: "AI客服助手", ratio: 100, tiers: [{ min: 100, gift: 10 }, { min: 5000, gift: 20 }] },
-  { id: "CT05", name: "数据洞察", ratio: 100, tiers: [{ min: 500, gift: 5 }, { min: 5000, gift: 15 }] },
+const RECHARGE_PRODUCTS: RechargeProductDef[] = [
+  { id: "RP000008", name: "数据洞察季度通用充值", targetType: "category", targetKey: "数据洞察", pointsMode: "general", remark: "面向数据分析团队的通用积分充值,平台内任意产品可用。", tiers: [
+    { min: 200, max: 1000, generalRate: 8, generalBonus: 5, proRate: 0, proBonus: 0 },
+    { min: 1000, max: 5000, generalRate: 8, generalBonus: 10, proRate: 0, proBonus: 0 },
+    { min: 5000, max: 20000, generalRate: 8, generalBonus: 18, proRate: 0, proBonus: 0 },
+  ]},
+  { id: "RP000007", name: "AI内容创作专享充值", targetType: "category", targetKey: "AI内容创作", pointsMode: "professional", remark: "仅限 AI 内容创作分类内产品消费的专业积分。", tiers: [
+    { min: 100, max: 500, generalRate: 0, generalBonus: 0, proRate: 12, proBonus: 5 },
+    { min: 500, max: 3000, generalRate: 0, generalBonus: 0, proRate: 12, proBonus: 12 },
+    { min: 3000, max: 10000, generalRate: 0, generalBonus: 0, proRate: 12, proBonus: 20 },
+  ]},
+  { id: "RP000005", name: "Tiktok获客单品通用充值", targetType: "basic", targetKey: "BP000032", pointsMode: "general", remark: "锁定 Tiktok 获客销售入口,发放可全平台使用的通用积分。", tiers: [
+    { min: 80, max: 400, generalRate: 6, generalBonus: 3, proRate: 0, proBonus: 0 },
+    { min: 400, max: 2000, generalRate: 6, generalBonus: 8, proRate: 0, proBonus: 0 },
+  ]},
+  { id: "RP000004", name: "AI图生视频混合充值", targetType: "basic", targetKey: "BP000030", pointsMode: "mixed", remark: "单品促销:同时发放通用积分与定向专业积分。", tiers: [
+    { min: 100, max: 500, generalRate: 3, generalBonus: 5, proRate: 10, proBonus: 10 },
+    { min: 500, max: 3000, generalRate: 3, generalBonus: 10, proRate: 10, proBonus: 20 },
+    { min: 3000, max: 12000, generalRate: 3, generalBonus: 15, proRate: 10, proBonus: 30 },
+  ]},
+  { id: "RP000002", name: "AI视频制作充值套餐", targetType: "category", targetKey: "AI视频制作", pointsMode: "mixed", remark: "面向视频团队的阶梯充值方案,金额越大赠送越多。", tiers: [
+    { min: 100, max: 500, generalRate: 5, generalBonus: 5, proRate: 10, proBonus: 10 },
+    { min: 500, max: 2000, generalRate: 5, generalBonus: 8, proRate: 10, proBonus: 15 },
+    { min: 2000, max: 10000, generalRate: 5, generalBonus: 12, proRate: 10, proBonus: 25 },
+  ]},
+  { id: "RP000001", name: "AI文生图体验充值", targetType: "basic", targetKey: "BP000043", pointsMode: "professional", remark: "针对单一基础产品的体验充值。", tiers: [
+    { min: 50, max: 200, generalRate: 0, generalBonus: 0, proRate: 20, proBonus: 0 },
+    { min: 200, max: 1000, generalRate: 0, generalBonus: 0, proRate: 20, proBonus: 8 },
+  ]},
 ];
-function matchTier(cat: RechargeCategory, amount: number) {
-  let matched = cat.tiers[0];
-  for (const t of cat.tiers) if (amount >= t.min) matched = t;
-  return amount >= cat.tiers[0].min ? matched : null;
+const POINTS_MODE_LABEL: Record<RechargePointsMode, string> = {
+  general: "仅通用积分",
+  professional: "仅专业积分",
+  mixed: "混合发放",
+};
+function matchRechargeTier(p: RechargeProductDef, amount: number): RechargeTier | null {
+  if (amount <= 0) return null;
+  // 在 [min, max] 区间内匹配;若超过最大阶梯上限,沿用最后一阶梯
+  for (const t of p.tiers) {
+    if (amount >= t.min && amount <= t.max) return t;
+  }
+  const last = p.tiers[p.tiers.length - 1];
+  if (last && amount > last.max) return last;
+  return null;
+}
+function calcRechargePoints(tier: RechargeTier | null, amount: number) {
+  if (!tier || amount <= 0) return { basic: 0, gift: 0 };
+  const basicGeneral = Math.round(amount * tier.generalRate);
+  const basicPro = Math.round(amount * tier.proRate);
+  const giftGeneral = Math.round((basicGeneral * tier.generalBonus) / 100);
+  const giftPro = Math.round((basicPro * tier.proBonus) / 100);
+  return { basic: basicGeneral + basicPro, gift: giftGeneral + giftPro };
 }
 
 function addYears(dateStr: string, years: number) {
