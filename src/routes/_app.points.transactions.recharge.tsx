@@ -889,61 +889,228 @@ function RechargePage() {
                     </Badge>
                   </div>
                 )}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <Label>充值类型</Label>
-                    <Select
-                      value={wizardType}
-                      onValueChange={(v) => {
-                        setWizardType(v as RechargeType);
-                        setWizardProduct(v === "积分充值" ? PRODUCTS_RECHARGE[0] : PRODUCTS_BUNDLE[0]);
-                      }}
-                    >
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="积分充值">积分充值</SelectItem>
-                        <SelectItem value="套餐购买">套餐购买</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>产品名称</Label>
-                    <Select value={wizardProduct} onValueChange={setWizardProduct}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {productOptions.map((p) => (
-                          <SelectItem key={p} value={p}>{p}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>充值金额 (元)</Label>
-                    <Input
-                      type="number"
-                      value={wizardAmount}
-                      onChange={(e) => setWizardAmount(Number(e.target.value))}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>备注</Label>
-                    <Input
-                      value={wizardRemark}
-                      onChange={(e) => setWizardRemark(e.target.value)}
-                      placeholder="选填"
-                    />
-                  </div>
+
+                <div className="flex items-center gap-2 text-base font-semibold">
+                  选择充值产品
+                  <TooltipProvider delayDuration={150}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <HelpCircle className="h-4 w-4 text-amber-500 cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs">
+                        套餐产品按固定金额发放预设积分;充值产品按所选分类的转化比例与阶梯赠送规则计算积分。
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
-                <div className="rounded-md border bg-muted/30 px-3 py-2 text-xs text-muted-foreground flex items-start gap-2">
-                  <Info className="h-3.5 w-3.5 mt-0.5 text-amber-500 shrink-0" />
-                  <span>
-                    本次按「{wizardType}」规则计算: 基础积分 {(wizardAmount * 10).toLocaleString()},预计赠送积分 +{Math.round(wizardAmount * 10 * 0.1).toLocaleString()}。
-                  </span>
+
+                <Tabs
+                  value={productTab}
+                  onValueChange={(v) => setProductTab(v as "bundle" | "recharge")}
+                >
+                  <TabsList className="bg-transparent p-0 h-auto border-b rounded-none w-full justify-start gap-6">
+                    <TabsTrigger
+                      value="bundle"
+                      className="px-0 pb-2.5 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                    >
+                      套餐产品
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="recharge"
+                      className="px-0 pb-2.5 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                    >
+                      充值产品
+                    </TabsTrigger>
+                  </TabsList>
+
+                  {/* 套餐产品 */}
+                  <TabsContent value="bundle" className="mt-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {BUNDLE_PRODUCTS.map((b) => {
+                        const active = pickedBundleId === b.id;
+                        return (
+                          <button
+                            key={b.id}
+                            type="button"
+                            onClick={() => setPickedBundleId(b.id)}
+                            className={`relative text-left rounded-xl border-2 p-5 transition-all ${
+                              active
+                                ? "border-primary bg-primary/5 shadow-sm"
+                                : "border-dashed border-border bg-card hover:border-primary/40 hover:bg-accent/20"
+                            }`}
+                          >
+                            {active && (
+                              <span className="absolute top-3 right-3 inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground shadow">
+                                <Check className="h-3.5 w-3.5" />
+                              </span>
+                            )}
+                            <div className="text-lg font-bold">{b.name}</div>
+                            <div className="mt-1 text-xs text-muted-foreground line-clamp-2 min-h-[2rem]">
+                              {b.description}
+                            </div>
+                            <div className="mt-3 flex items-baseline gap-2">
+                              <span className="text-2xl font-bold text-rose-600 tabular-nums">
+                                ¥ {b.amount.toLocaleString()}
+                              </span>
+                              <span className="text-xs text-muted-foreground">充值金额</span>
+                            </div>
+                            <div className="mt-3 flex items-center justify-between text-xs">
+                              <span className="text-foreground/80">
+                                <span className="tabular-nums font-medium">{b.basicPoints.toLocaleString()}</span> 基础积分
+                              </span>
+                              <span className="text-emerald-600 font-medium tabular-nums">
+                                +{b.giftPoints.toLocaleString()} 赠送积分
+                              </span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </TabsContent>
+
+                  {/* 充值产品 */}
+                  <TabsContent value="recharge" className="mt-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <div className="space-y-1.5">
+                          <Label>
+                            产品分类 <span className="text-destructive">*</span>
+                          </Label>
+                          <Select value={rechargeCategoryId} onValueChange={setRechargeCategoryId}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="请选择产品分类" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {RECHARGE_CATEGORIES.map((c) => (
+                                <SelectItem key={c.id} value={c.id}>
+                                  {c.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label>
+                            充值金额 (元) <span className="text-destructive">*</span>
+                          </Label>
+                          <div className="flex">
+                            <span className="inline-flex items-center justify-center w-10 rounded-l-md border border-r-0 bg-muted text-muted-foreground text-sm">
+                              ¥
+                            </span>
+                            <Input
+                              type="number"
+                              min={0}
+                              value={rechargeAmount}
+                              onChange={(e) =>
+                                setRechargeAmount(e.target.value === "" ? "" : Number(e.target.value))
+                              }
+                              placeholder="请输入充值金额"
+                              className="rounded-l-none"
+                            />
+                          </div>
+                          {pickedCategory && (
+                            <div className="flex flex-wrap gap-1.5 pt-1">
+                              {pickedCategory.tiers.map((t) => (
+                                <button
+                                  key={t.min}
+                                  type="button"
+                                  onClick={() => setRechargeAmount(t.min)}
+                                  className="text-[11px] px-2 py-0.5 rounded border border-border bg-muted/40 hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-colors"
+                                >
+                                  ¥{t.min.toLocaleString()} 起 · +{t.gift}%
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* 预览面板 */}
+                      <div className="rounded-xl border bg-muted/20 p-5 min-h-[280px] flex">
+                        {pickedCategory && rechargeAmt > 0 ? (
+                          <div className="w-full">
+                            <div className="text-center">
+                              <div className="text-xs text-muted-foreground">预计获得总积分</div>
+                              <div className="mt-1 text-3xl font-bold text-emerald-600 tabular-nums">
+                                +{(rechargeBasic + rechargeGift).toLocaleString()}
+                              </div>
+                            </div>
+                            <div className="my-4 border-t" />
+                            <div className="text-center">
+                              <div className="text-xs text-muted-foreground">匹配阶梯</div>
+                              <div className="mt-1 text-lg font-semibold text-rose-600 tabular-nums">
+                                {rechargeTier ? `¥${rechargeTier.min.toLocaleString()}` : "未匹配"}
+                              </div>
+                            </div>
+                            <div className="mt-5 space-y-2.5 text-sm">
+                              <div className="flex items-center justify-between">
+                                <span className="text-muted-foreground">基础积分转化比例</span>
+                                <span className="text-primary font-medium tabular-nums">
+                                  {pickedCategory.ratio}%
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <span className="text-muted-foreground">基础积分</span>
+                                <span className="font-semibold tabular-nums">
+                                  {rechargeBasic.toLocaleString()}
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <span className="text-muted-foreground">积分赠送比例</span>
+                                <span className="text-amber-600 font-medium tabular-nums">
+                                  {rechargeTier ? `${rechargeTier.gift}%` : "0%"}
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <span className="text-muted-foreground">赠送积分</span>
+                                <span className="text-emerald-600 font-medium tabular-nums">
+                                  +{rechargeGift.toLocaleString()}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="m-auto text-center text-muted-foreground">
+                            <ShoppingCart className="h-10 w-10 mx-auto opacity-40" />
+                            <div className="mt-3 text-sm">请选择产品分类并输入充值金额</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+
+                {/* 积分到期日 */}
+                <div className="space-y-2 pt-2 border-t">
+                  <div className="flex items-center gap-2 text-sm font-semibold pt-3">
+                    <CalendarDays className="h-4 w-4 text-primary" />
+                    积分到期日设置
+                  </div>
+                  <div className="text-xs text-muted-foreground">设置积分有效期至</div>
+                  <div className="relative max-w-[260px]">
+                    <CalendarDays className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      type="date"
+                      value={expireDate}
+                      onChange={(e) => setExpireDate(e.target.value)}
+                      className="pl-9 font-mono text-xs"
+                    />
+                  </div>
+                  <div className="text-[11px] text-muted-foreground">默认有效期为一年</div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label>备注</Label>
+                  <Input
+                    value={wizardRemark}
+                    onChange={(e) => setWizardRemark(e.target.value)}
+                    placeholder="选填,例如「2026 Q1 续费补单」"
+                  />
                 </div>
               </div>
             )}
 
-            {wizardStep === 3 && pickedTenant && (
+            {wizardStep === 3 && pickedTenant && summary && (
               <div className="space-y-4 pb-2">
                 <div className="rounded-lg border bg-card p-5 space-y-3">
                   <div className="text-sm font-semibold text-foreground">订单信息确认</div>
@@ -956,26 +1123,37 @@ function RechargePage() {
                         <Badge
                           variant="outline"
                           className={
-                            wizardType === "积分充值"
+                            summary.type === "积分充值"
                               ? "bg-sky-50 text-sky-700 border-sky-200"
                               : "bg-emerald-50 text-emerald-700 border-emerald-200"
                           }
                         >
-                          {wizardType}
+                          {summary.type}
                         </Badge>
                       }
                     />
-                    <DetailItem label="产品名称" value={wizardProduct} />
+                    <DetailItem label="产品名称" value={summary.productName} />
                     <DetailItem
                       label="充值金额"
-                      value={<span className="font-semibold text-rose-600">¥{wizardAmount.toLocaleString()}</span>}
+                      value={<span className="font-semibold text-rose-600">¥{summary.amount.toLocaleString()}</span>}
                     />
-                    <DetailItem label="基础积分" value={(wizardAmount * 10).toLocaleString()} />
+                    <DetailItem label="基础积分" value={summary.basic.toLocaleString()} />
                     <DetailItem
                       label="赠送积分"
-                      value={<span className="text-emerald-600 font-medium">+{Math.round(wizardAmount * 10 * 0.1).toLocaleString()}</span>}
+                      value={
+                        <span className={summary.gift > 0 ? "text-emerald-600 font-medium" : "text-muted-foreground"}>
+                          +{summary.gift.toLocaleString()}
+                        </span>
+                      }
                     />
+                    <DetailItem label="积分到期日" value={<span className="font-mono text-xs">{expireDate}</span>} />
                     <DetailItem label="备注" value={wizardRemark || <span className="text-muted-foreground">—</span>} />
+                  </div>
+                  <div className="pt-3 mt-2 border-t flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">本次发放总积分</span>
+                    <span className="text-2xl font-bold text-emerald-600 tabular-nums">
+                      +{(summary.basic + summary.gift).toLocaleString()}
+                    </span>
                   </div>
                 </div>
               </div>
