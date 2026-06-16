@@ -412,6 +412,7 @@ function RechargeProductsPage() {
                 <TableHead>充值产品名称</TableHead>
                 <TableHead className="whitespace-nowrap">目标类型</TableHead>
                 <TableHead>目标对象</TableHead>
+                <TableHead className="whitespace-nowrap">积分模式</TableHead>
                 <TableHead className="text-right whitespace-nowrap">阶梯数</TableHead>
                 <TableHead className="whitespace-nowrap">启用状态</TableHead>
                 <TableHead className="whitespace-nowrap">创建时间</TableHead>
@@ -421,7 +422,7 @@ function RechargeProductsPage() {
             <TableBody>
               {pageData.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-12 text-muted-foreground">
+                  <TableCell colSpan={10} className="text-center py-12 text-muted-foreground">
                     暂无匹配的充值产品
                   </TableCell>
                 </TableRow>
@@ -448,6 +449,21 @@ function RechargeProductsPage() {
                       )}
                     </TableCell>
                     <TableCell className="text-muted-foreground">{targetLabel(p)}</TableCell>
+                    <TableCell>
+                      {p.pointsMode === "general" ? (
+                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
+                          <Coins className="h-3 w-3 mr-1" /> 仅通用
+                        </Badge>
+                      ) : p.pointsMode === "professional" ? (
+                        <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-900">
+                          <Gem className="h-3 w-3 mr-1" /> 仅专业
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900">
+                          <Sparkles className="h-3 w-3 mr-1" /> 混合发放
+                        </Badge>
+                      )}
+                    </TableCell>
                     <TableCell className="text-right tabular-nums">{p.tiers.length}</TableCell>
                     <TableCell>
                       <TooltipProvider delayDuration={150}>
