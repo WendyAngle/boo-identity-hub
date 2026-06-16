@@ -386,25 +386,7 @@ function RechargePage() {
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
-  const [createOpen, setCreateOpen] = useState(false);
   const [detailRow, setDetailRow] = useState<RechargeRow | null>(null);
-
-  // 新增充值 多步向导
-  const [wizardStep, setWizardStep] = useState<1 | 2 | 3>(1);
-  const [pickedTenantIds, setPickedTenantIds] = useState<string[]>([]);
-  const [tenantKw, setTenantKw] = useState("");
-  const [tenantStatusF, setTenantStatusF] = useState("enabled");
-  const [tenantPage, setTenantPage] = useState(1);
-  const TENANT_PAGE_SIZE = 5;
-  // 选择产品(第二步)
-  const [productTab, setProductTab] = useState<"bundle" | "recharge">("bundle");
-  const [pickedBundleId, setPickedBundleId] = useState<string>("");
-  const [rechargeProductId, setRechargeProductId] = useState<string>("");
-  const [rechargeAmount, setRechargeAmount] = useState<number | "">("");
-  const [expireDate, setExpireDate] = useState<string>(() =>
-    addYears(fmtDate(new Date()), 1),
-  );
-  const [wizardRemark, setWizardRemark] = useState("");
 
   const filtered = useMemo(() => {
     return MOCK.filter((r) => {
