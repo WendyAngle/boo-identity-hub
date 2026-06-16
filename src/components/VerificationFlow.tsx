@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   ChevronRight,
@@ -200,7 +200,7 @@ export function VerificationFlow({ subject }: Props) {
     : "提交企业与法人资料，通过支付宝实人认证完成核验";
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
-  const [levelKey, setLevelKey] = useState<LevelKey>("L2");
+  const [levelKey, setLevelKey] = useState<LevelKey>(isPersonal ? "L2" : "L4");
   const [form, setForm] = useState<Record<string, string>>({});
   const provider = "alipay";
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -208,11 +208,23 @@ export function VerificationFlow({ subject }: Props) {
 
   const currentLevel = useMemo(() => levels.find((l) => l.key === levelKey)!, [levels, levelKey]);
 
-  const STEPS = [
-    { n: 1, title: "选择认证等级", icon: ShieldCheck },
-    { n: 2, title: "填写认证资料", icon: FileText },
-    { n: 3, title: "提交与结果", icon: CheckCircle2 },
-  ] as const;
+  const STEPS = (
+    isPersonal
+      ? [
+          { n: 1, title: "选择认证等级", icon: ShieldCheck },
+          { n: 2, title: "填写认证资料", icon: FileText },
+          { n: 3, title: "提交与结果", icon: CheckCircle2 },
+        ]
+      : [
+          { n: 2, title: "填写认证资料", icon: FileText },
+          { n: 3, title: "提交与结果", icon: CheckCircle2 },
+        ]
+  ) as ReadonlyArray<{ n: 1 | 2 | 3; title: string; icon: typeof ShieldCheck }>;
+
+  // Enterprise skips level selection — start at the fill-in step.
+  useEffect(() => {
+    if (!isPersonal && step === 1) setStep(2);
+  }, [isPersonal, step]);
 
   const updateField = (k: string, v: string) => setForm((s) => ({ ...s, [k]: v }));
 
@@ -226,7 +238,7 @@ export function VerificationFlow({ subject }: Props) {
     }
     setStep((s) => (Math.min(3, s + 1) as 1 | 2 | 3));
   };
-  const goPrev = () => setStep((s) => (Math.max(1, s - 1) as 1 | 2 | 3));
+  const goPrev = () => setStep((s) => (Math.max(isPersonal ? 1 : 2, s - 1) as 1 | 2 | 3));
 
   const onSubmit = () => {
     setDialogOpen(true);
@@ -319,7 +331,7 @@ export function VerificationFlow({ subject }: Props) {
       {/* Body grid */}
       <div className="px-8 py-6 grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
         <div className="space-y-6">
-          {step === 1 && (
+          {step === 1 && isPersonal && (
             <Card className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
@@ -371,7 +383,9 @@ export function VerificationFlow({ subject }: Props) {
                     当前等级：<span className="text-foreground font-medium">{currentLevel.key} · {currentLevel.title}</span>，共需 {currentLevel.fields.length} 项资料
                   </p>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => setStep(1)}>更改等级</Button>
+                {isPersonal && (
+                  <Button variant="ghost" size="sm" onClick={() => setStep(1)}>更改等级</Button>
+                )}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {currentLevel.fields.map((f) => {
@@ -479,7 +493,7 @@ export function VerificationFlow({ subject }: Props) {
           {/* Step Footer */}
           {step < 3 && (
             <div className="flex items-center justify-between">
-              <Button variant="ghost" onClick={goPrev} disabled={step === 1}>
+              <Button variant="ghost" onClick={goPrev} disabled={step === (isPersonal ? 1 : 2)}>
                 <ArrowLeft className="h-4 w-4 mr-1" /> 上一步
               </Button>
               {step < 2 ? (
