@@ -1160,22 +1160,32 @@ function RechargePage() {
             )}
           </div>
 
-          <DialogFooter className="px-6 py-4 border-t bg-muted/20">
-            <Button variant="outline" onClick={() => setCreateOpen(false)}>取消</Button>
-            {wizardStep > 1 && (
-              <Button variant="outline" onClick={prevStep}>
-                <ChevronLeft className="h-4 w-4" /> 上一步
-              </Button>
-            )}
-            {wizardStep < 3 ? (
-              <Button onClick={nextStep} disabled={wizardStep === 1 && !pickedTenantId}>
-                下一步 <ChevronRight className="h-4 w-4" />
-              </Button>
-            ) : (
-              <Button onClick={submitCreate}>
-                <Check className="h-4 w-4" /> 确认充值
-              </Button>
-            )}
+          <DialogFooter className="px-6 py-4 border-t bg-muted/20 sm:justify-between">
+            <div>
+              {wizardStep > 1 && (
+                <Button variant="outline" onClick={prevStep}>
+                  <ChevronLeft className="h-4 w-4" /> 上一步
+                </Button>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" onClick={() => setCreateOpen(false)}>取消</Button>
+              {wizardStep < 3 ? (
+                <Button
+                  onClick={nextStep}
+                  disabled={
+                    (wizardStep === 1 && !pickedTenantId) ||
+                    (wizardStep === 2 && !summary)
+                  }
+                >
+                  下一步 <ChevronRight className="h-4 w-4" />
+                </Button>
+              ) : (
+                <Button onClick={submitCreate}>
+                  <Check className="h-4 w-4" /> 确认充值
+                </Button>
+              )}
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
