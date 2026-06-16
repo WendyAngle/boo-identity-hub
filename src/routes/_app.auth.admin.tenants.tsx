@@ -1449,33 +1449,16 @@ interface AuthPolicyDialogProps {
 
 function AuthPolicyDialog({ tenant, existing, onOpenChange, onSubmit }: AuthPolicyDialogProps) {
   const [policy, setPolicy] = useState<AuthPolicy>(DEFAULT_POLICY);
-  const [featureInput, setFeatureInput] = useState("");
 
   useEffect(() => {
     if (tenant) {
       setPolicy(existing ?? DEFAULT_POLICY);
-      setFeatureInput("");
     }
   }, [tenant, existing]);
 
   const set = <K extends keyof AuthPolicy>(k: K, v: AuthPolicy[K]) =>
     setPolicy((p) => ({ ...p, [k]: v }));
 
-  const addFeature = () => {
-    const v = featureInput.trim();
-    if (!v) return;
-    if (policy.sensitiveFeatures.includes(v)) {
-      setFeatureInput("");
-      return;
-    }
-    set("sensitiveFeatures", [...policy.sensitiveFeatures, v]);
-    setFeatureInput("");
-  };
-
-  const removeFeature = (v: string) =>
-    set("sensitiveFeatures", policy.sensitiveFeatures.filter((x) => x !== v));
-
-  const isPersonal = tenant?.type === "个人用户";
   const isEdit = !!existing;
 
   return (
@@ -1527,71 +1510,14 @@ function AuthPolicyDialog({ tenant, existing, onOpenChange, onSubmit }: AuthPoli
             {/* 认证时机 */}
             <div className="space-y-2">
               <Label className="text-sm">认证时机</Label>
-              <div className="grid grid-cols-2 gap-2">
-                {(["首次登录", "使用敏感功能"] as AuthTiming[]).map((t) => (
-                  <button
-                    key={t}
-                    type="button"
-                    onClick={() => set("timing", t)}
-                    className={
-                      "rounded-md border px-3 py-2.5 text-sm text-left transition-colors " +
-                      (policy.timing === t
-                        ? "border-primary bg-primary/5 text-foreground"
-                        : "border-input hover:bg-accent/50 text-muted-foreground")
-                    }
-                  >
-                    <div className="font-medium text-foreground">{t}</div>
-                    <div className="text-xs text-muted-foreground mt-0.5">
-                      {t === "首次登录" ? "用户首次登录即触发实名认证" : "访问指定敏感功能时触发"}
-                    </div>
-                  </button>
-                ))}
-              </div>
-
-              {policy.timing === "使用敏感功能" && (
-                <div className="mt-3 rounded-md border border-dashed bg-muted/20 p-3 space-y-2">
-                  <Label className="text-xs text-muted-foreground">敏感功能列表</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      value={featureInput}
-                      onChange={(e) => setFeatureInput(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          addFeature();
-                        }
-                      }}
-                      placeholder="输入敏感功能名称，回车添加，如：发起提现"
-                      className="h-9"
-                    />
-                    <Button type="button" variant="outline" onClick={addFeature}>
-                      <Plus className="h-4 w-4" /> 添加
-                    </Button>
-                  </div>
-                  {policy.sensitiveFeatures.length > 0 ? (
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      {policy.sensitiveFeatures.map((f) => (
-                        <Badge
-                          key={f}
-                          variant="secondary"
-                          className="gap-1 pr-1 font-normal"
-                        >
-                          {f}
-                          <button
-                            type="button"
-                            onClick={() => removeFeature(f)}
-                            className="rounded hover:bg-background/60 p-0.5"
-                          >
-                            <X className="h-3 w-3" />
-                          </button>
-                        </Badge>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-xs text-muted-foreground">尚未添加，至少添加一项敏感功能</p>
-                  )}
+              <div
+                className="rounded-md border border-primary bg-primary/5 px-3 py-2.5 text-sm"
+              >
+                <div className="font-medium text-foreground">首次登录</div>
+                <div className="text-xs text-muted-foreground mt-0.5">
+                  用户首次登录即触发实名认证
                 </div>
-              )}
+              </div>
             </div>
 
             {/* 认证等级 */}
@@ -1608,8 +1534,8 @@ function AuthPolicyDialog({ tenant, existing, onOpenChange, onSubmit }: AuthPoli
                 </SelectTrigger>
                 <SelectContent className="max-w-[--radix-select-trigger-width]">
                   {LEVEL_OPTIONS.map((l) => {
-                    const factors = isPersonal ? l.personalFactors : l.enterpriseFactors;
-                    const tag = isPersonal ? l.personalTag : l.enterpriseTag;
+                    const factors = l.enterpriseFactors;
+                    const tag = l.enterpriseTag;
                     return (
                       <SelectItem key={l.key} value={l.key} className="py-2.5">
                         <div className="flex flex-col gap-1.5">
