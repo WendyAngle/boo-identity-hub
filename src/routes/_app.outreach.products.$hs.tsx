@@ -13,7 +13,6 @@ import {
   CheckCircle2,
   Circle,
   Anchor,
-  Star,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -197,7 +196,16 @@ function ProductDetailPage() {
             <h1 className="text-3xl font-bold tracking-tight">{l4.name}</h1>
             <p className="text-muted-foreground mt-1">{l4.en}</p>
           </div>
-          <FavoriteButton hs={l4.hs} />
+          <FavoriteToggle
+            kind="product"
+            refId={l4.hs}
+            payload={{
+              title: l4.name,
+              subtitle: l4.en,
+              meta: { hs: l4.hs, category: `${l1.name} / ${l2.name}` },
+            }}
+            stopPropagation={false}
+          />
         </div>
         <p className="mt-5 text-sm text-foreground/80 leading-relaxed max-w-4xl">
           已成型或加工、可直接用于道路、庭院、广场、台阶或边界安装的{l4.name}、路缘石和铺地石,不包括板岩;不包括未切割或仅初级加工的建筑石材、砂石骨料、石粉等 PC0206 原料、石材砖块及粒粉、板岩制品、混凝土铺装制品、陶瓷砖和金属建材。
@@ -363,44 +371,7 @@ function KPICard({
   );
 }
 
-function FavoriteButton({ hs }: { hs: string }) {
-  const key = `fav:product:${hs}`;
-  const [fav, setFav] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return window.localStorage.getItem(key) === "1";
-  });
-  const toggle = () => {
-    setFav((v) => {
-      const next = !v;
-      try {
-        window.localStorage.setItem(key, next ? "1" : "0");
-      } catch {}
-      return next;
-    });
-  };
-  return (
-    <TooltipProvider delayDuration={100}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={toggle}
-            aria-label={fav ? "取消收藏" : "收藏"}
-            className={
-              fav
-                ? "border-amber-300 bg-amber-50 text-amber-500 hover:bg-amber-100 hover:text-amber-600"
-                : "text-muted-foreground hover:text-amber-500"
-            }
-          >
-            <Star className={"h-5 w-5 " + (fav ? "fill-amber-400" : "")} />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>{fav ? "点击取消收藏" : "点击收藏"}</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
-}
+
 
 function MarketCard({
   title,
