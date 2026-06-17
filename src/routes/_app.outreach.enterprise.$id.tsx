@@ -185,16 +185,20 @@ function EnterpriseDetailPage() {
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {e.contacts.map((c, idx) => (
-            <div
+            <Link
               key={idx}
               id={`contact-${idx}`}
-              className="rounded-lg border border-border bg-card hover:ring-1 hover:ring-primary/30 transition-shadow"
+              to="/outreach/enterprise/$id/contact/$idx"
+              params={{ id: e.id, idx: String(idx) }}
+              className="group rounded-lg border border-border bg-card hover:ring-1 hover:ring-primary/30 hover:border-primary/40 transition-shadow block"
             >
               <div className="flex items-center gap-3 px-4 py-3 border-b border-border/70">
                 <div className="h-9 w-9 rounded-full bg-primary/15 text-primary flex items-center justify-center font-medium uppercase">
                   {c.name.split(" ").map((w) => w[0]).join("").slice(0, 2)}
                 </div>
-                <div className="font-medium flex-1 truncate">{c.name}</div>
+                <div className="font-medium flex-1 truncate group-hover:text-primary transition-colors">
+                  {c.name}
+                </div>
                 <FavoriteToggle
                   kind="contact"
                   refId={`${e.id}:${idx}`}
@@ -224,7 +228,7 @@ function EnterpriseDetailPage() {
                   </div>
                 )}
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </Section>
