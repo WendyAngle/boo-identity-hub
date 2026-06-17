@@ -492,6 +492,17 @@ function FavoriteCard({
       </Link>
     );
   }
+  if (target.kind === "contact") {
+    return (
+      <Link
+        to="/outreach/enterprise/$id/contact/$idx"
+        params={{ id: target.id, idx: target.idx }}
+        className="group block"
+      >
+        {inner}
+      </Link>
+    );
+  }
   if (target.kind === "product") {
     return (
       <Link to="/outreach/products/$hs" params={{ hs: target.id }} className="group block">
@@ -593,6 +604,7 @@ function useTarget(
   r: FavoriteRecord,
 ):
   | { kind: "enterprise"; id: string; hash?: string }
+  | { kind: "contact"; id: string; idx: string }
   | { kind: "product"; id: string }
   | { kind: "bill" }
   | null {
@@ -600,9 +612,9 @@ function useTarget(
   if (r.kind === "contact" && r.parentRef) {
     const contactIdx = r.refId.split(":")[1];
     return {
-      kind: "enterprise",
+      kind: "contact",
       id: r.parentRef.id,
-      hash: contactIdx ? `contact-${contactIdx}` : undefined,
+      idx: contactIdx ?? "0",
     };
   }
   if (r.kind === "product") return { kind: "product", id: r.refId };
