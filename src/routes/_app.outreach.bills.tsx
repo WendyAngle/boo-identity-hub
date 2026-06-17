@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/sheet";
 import heroBg from "@/assets/bills-hero.jpg";
 import { ENTERPRISES } from "@/data/enterprises";
+import { FavoriteToggle } from "@/components/FavoriteToggle";
 
 export const Route = createFileRoute("/_app/outreach/bills")({
   head: () => ({ meta: [{ title: "触达客户管理 · 提单 | Boo数据平台" }] }),
@@ -573,6 +574,7 @@ function DetailTable({ rows }: { rows: BillDetail[] }) {
       <Table>
         <TableHeader>
           <TableRow className="bg-primary/5 hover:bg-primary/5">
+            <TableHead className="w-[44px]"></TableHead>
             <TableHead className="w-[110px]">日期</TableHead>
             <TableHead className="w-[100px]">HS Code</TableHead>
             <TableHead className="w-[200px]">出口企业</TableHead>
@@ -584,6 +586,26 @@ function DetailTable({ rows }: { rows: BillDetail[] }) {
         <TableBody>
           {rows.map((b) => (
             <TableRow key={b.id} className="align-top">
+              <TableCell className="py-4">
+                <FavoriteToggle
+                  kind="bill"
+                  refId={b.id}
+                  payload={{
+                    title: b.id,
+                    subtitle: b.desc,
+                    meta: {
+                      date: b.date,
+                      hs: b.hs,
+                      exporter: b.exporter?.name || "",
+                      importer: b.importer.name,
+                      fromPort: b.fromPort.name,
+                      toPort: b.toPort.name,
+                    },
+                  }}
+                  variant="inline"
+                  size="sm"
+                />
+              </TableCell>
               <TableCell className="font-mono text-xs text-muted-foreground py-4">
                 {b.date}
               </TableCell>
@@ -614,7 +636,7 @@ function DetailTable({ rows }: { rows: BillDetail[] }) {
           ))}
           {rows.length === 0 && (
             <TableRow>
-              <TableCell colSpan={6} className="text-center text-muted-foreground py-12">
+              <TableCell colSpan={7} className="text-center text-muted-foreground py-12">
                 没有匹配的提单
               </TableCell>
             </TableRow>
@@ -759,6 +781,7 @@ function SummaryTable({ rows, dim }: { rows: SummaryRow[]; dim: Dim }) {
                         <Table>
                           <TableHeader>
                             <TableRow className="bg-primary/80 hover:bg-primary/80 border-0">
+                              <TableHead className="text-primary-foreground w-[44px]"></TableHead>
                               <TableHead className="text-primary-foreground w-[110px]">日期</TableHead>
                               <TableHead className="text-primary-foreground w-[90px]">HS</TableHead>
                               <TableHead className="text-primary-foreground w-[200px]">出口企业</TableHead>
@@ -769,6 +792,26 @@ function SummaryTable({ rows, dim }: { rows: SummaryRow[]; dim: Dim }) {
                           <TableBody>
                             {r.bills.slice(0, 6).map((b) => (
                               <TableRow key={b.id}>
+                                <TableCell>
+                                  <FavoriteToggle
+                                    kind="bill"
+                                    refId={b.id}
+                                    payload={{
+                                      title: b.id,
+                                      subtitle: b.desc,
+                                      meta: {
+                                        date: b.date,
+                                        hs: b.hs,
+                                        exporter: b.exporter?.name || "",
+                                        importer: b.importer.name,
+                                        fromPort: b.fromPort.name,
+                                        toPort: b.toPort.name,
+                                      },
+                                    }}
+                                    variant="inline"
+                                    size="sm"
+                                  />
+                                </TableCell>
                                 <TableCell className="font-mono text-xs text-muted-foreground">{b.date}</TableCell>
                                 <TableCell className="font-mono text-xs text-muted-foreground">{b.hs}</TableCell>
                                 <TableCell>
