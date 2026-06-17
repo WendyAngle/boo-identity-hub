@@ -19,7 +19,6 @@ import {
   ArrowRight,
   Anchor,
   EyeOff,
-  RotateCcw,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -44,7 +43,6 @@ import {
   useFavorites,
   removeFavoritesByIds,
   seedDemoFavoritesIfEmpty,
-  resetDemoFavorites,
   type FavoriteKind,
   type FavoriteRecord,
 } from "@/lib/favorites";
@@ -228,19 +226,6 @@ function FavoritesPage() {
               <EyeOff className="h-3.5 w-3.5 mr-1.5" />
               查看空状态演示
             </Link>
-          </Button>
-          <Button
-            size="sm"
-            variant="secondary"
-            className="h-8 bg-white/15 text-white border-white/20 hover:bg-white/25"
-            onClick={() => {
-              if (window.confirm("将清空当前收藏并重新载入演示数据，是否继续？")) {
-                resetDemoFavorites();
-              }
-            }}
-          >
-            <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
-            重置为演示数据
           </Button>
         </div>
       </section>
