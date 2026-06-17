@@ -167,15 +167,11 @@ function EnterpriseDetailPage() {
           </Field>
           <Field label="一级行政区">{e.province}</Field>
           <Field label="坐标 / 城市">{e.city}</Field>
-          <Field label="社交账号">
-            <div className="flex gap-1.5 mt-0.5">
-              <SocialBadge active={e.socials.linkedin} kind="linkedin" />
-              <SocialBadge active={e.socials.facebook} kind="facebook" />
-              <SocialBadge active={e.socials.twitter} kind="twitter" />
-            </div>
-          </Field>
         </div>
       </Section>
+
+      {/* 社交媒体 */}
+      <SocialMediaSection e={e} />
 
       {/* 关联人物 */}
       <Section
