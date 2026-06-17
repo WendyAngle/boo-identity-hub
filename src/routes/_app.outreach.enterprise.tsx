@@ -186,6 +186,53 @@ function OutreachEnterprisePage() {
         </Button>
       </Card>
 
+      {hasScenario && (
+        <Card className="p-3 flex flex-wrap items-center gap-2">
+          <span className="text-sm text-muted-foreground shrink-0">筛选场景：</span>
+          {product && (
+            <ScenarioChip
+              icon={<Package className="h-3.5 w-3.5" />}
+              tone="primary"
+              onRemove={() => removeScenarioKey("product")}
+            >
+              {product}
+            </ScenarioChip>
+          )}
+          {hs && (
+            <ScenarioChip
+              icon={<Hash className="h-3.5 w-3.5" />}
+              tone="primary"
+              onRemove={() => removeScenarioKey("hs")}
+            >
+              <span className="font-mono">{hs}</span>
+            </ScenarioChip>
+          )}
+          {role && (
+            <ScenarioChip
+              icon={
+                role === "进口" ? (
+                  <ArrowDownToLine className="h-3.5 w-3.5" />
+                ) : (
+                  <ArrowUpFromLine className="h-3.5 w-3.5" />
+                )
+              }
+              tone="accent"
+              onRemove={() => removeScenarioKey("role")}
+            >
+              {role}
+            </ScenarioChip>
+          )}
+          <button
+            type="button"
+            onClick={clearScenario}
+            className="ml-auto text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+          >
+            <XIcon className="h-3.5 w-3.5" />
+            清除筛选
+          </button>
+        </Card>
+      )}
+
       {advancedOpen && (
         <Card className="p-5 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
