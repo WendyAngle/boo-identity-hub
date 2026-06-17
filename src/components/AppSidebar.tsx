@@ -59,6 +59,11 @@ const menu: Root[] = [
         to: "/outreach/products",
         children: [],
       },
+      {
+        label: "提单",
+        to: "/outreach/bills",
+        children: [],
+      },
     ],
   },
 ];
