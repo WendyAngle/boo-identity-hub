@@ -19,7 +19,7 @@ export interface FavoriteRecord extends FavoritePayload {
 }
 
 const STORAGE_KEY = "boo:favorites:v1";
-const SEED_FLAG_KEY = "boo:favorites:v1:seeded";
+const SEED_FLAG_KEY = "boo:favorites:v2:seeded";
 
 function readStore(): Record<string, FavoriteRecord> {
   if (typeof window === "undefined") return {};
@@ -207,7 +207,10 @@ function buildDemoRecords(): FavoriteRecord[] {
       createdAt: isoDaysAgo(idx + 1, 14, 30 + idx),
       title: contact.name,
       subtitle: contact.title,
-      meta: { email: contact.email },
+      meta: {
+        email: contact.email,
+        ...(contact.phone ? { phone: contact.phone } : {}),
+      },
       parentRef: { kind: "enterprise", id: ent.id, name: ent.name },
     });
   });
