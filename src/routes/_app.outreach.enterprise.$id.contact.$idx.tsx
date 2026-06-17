@@ -6,7 +6,6 @@ import {
   Calendar,
   ChevronRight,
   Clock,
-  ExternalLink,
   FileText,
   Globe,
   Info,
