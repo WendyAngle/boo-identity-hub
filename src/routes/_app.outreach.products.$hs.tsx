@@ -182,8 +182,8 @@ function ProductDetailPage() {
         <p className="text-xs text-muted-foreground mb-4">
           近 12 个月全球贸易额变化趋势 (来源: 贸易统计)
         </p>
-        <div className="h-72">
-          <ResponsiveContainer width="100%" height="100%">
+        <div style={{ width: "100%", height: 288 }}>
+          <ResponsiveContainer>
             <AreaChart data={trend} margin={{ left: 10, right: 20, top: 10, bottom: 0 }}>
               <defs>
                 <linearGradient id="grad-trend" x1="0" y1="0" x2="0" y2="1">
