@@ -149,6 +149,19 @@ function BillingPage() {
             )}
           </div>
         </div>
+        <div className="relative mt-4 flex flex-wrap items-center gap-2">
+          <Button
+            asChild
+            size="sm"
+            variant="secondary"
+            className="h-8 bg-white/15 text-white border-white/20 hover:bg-white/25"
+          >
+            <Link to="/outreach/billing-empty">
+              <EyeOff className="h-3.5 w-3.5 mr-1.5" />
+              查看空状态演示
+            </Link>
+          </Button>
+        </div>
       </section>
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
