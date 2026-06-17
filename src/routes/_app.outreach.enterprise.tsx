@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   Building2,
   ChevronRight,
@@ -11,6 +11,11 @@ import {
   Facebook,
   Twitter,
   RotateCcw,
+  X as XIcon,
+  Hash,
+  Package,
+  ArrowDownToLine,
+  ArrowUpFromLine,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,6 +35,14 @@ import { ENTERPRISES } from "@/data/enterprises";
 
 export const Route = createFileRoute("/_app/outreach/enterprise")({
   head: () => ({ meta: [{ title: "触达客户管理 · 企业 | Boo数据平台" }] }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    hs: typeof s.hs === "string" ? s.hs : undefined,
+    product: typeof s.product === "string" ? s.product : undefined,
+    role:
+      s.role === "进口" || s.role === "出口"
+        ? (s.role as "进口" | "出口")
+        : undefined,
+  }),
   component: OutreachEnterprisePage,
 });
 
@@ -56,6 +69,11 @@ const COUNTRIES = [
 const EMPLOYEE_SIZES = ["1-10", "11-50", "51-200", "201-500", "501-1000", "1001-5000", "5000+"];
 
 function OutreachEnterprisePage() {
+  const navigate = useNavigate();
+  const search = Route.useSearch();
+  const { hs, product, role } = search;
+  const hasScenario = !!(hs || product || role);
+
   const [keyword, setKeyword] = useState("");
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [industry, setIndustry] = useState("all");
@@ -71,9 +89,11 @@ function OutreachEnterprisePage() {
       if (industry !== "all" && e.industry !== industry) return false;
       if (country !== "all" && e.country !== country) return false;
       if (employees !== "all" && e.employees !== employees) return false;
+      if (role === "进口" && e.tradeRole === "出口商") return false;
+      if (role === "出口" && e.tradeRole === "进口商") return false;
       return true;
     });
-  }, [keyword, industry, country, employees]);
+  }, [keyword, industry, country, employees, role]);
 
   const total = filtered.length;
   const pageData = useMemo(
@@ -92,6 +112,18 @@ function OutreachEnterprisePage() {
     (industry !== "all" ? 1 : 0) +
     (country !== "all" ? 1 : 0) +
     (employees !== "all" ? 1 : 0);
+
+  const clearScenario = () => {
+    navigate({ to: "/outreach/enterprise", search: {} });
+    setPage(1);
+  };
+  const removeScenarioKey = (k: "hs" | "product" | "role") => {
+    navigate({
+      to: "/outreach/enterprise",
+      search: { ...search, [k]: undefined },
+    });
+    setPage(1);
+  };
 
   return (
     <div className="p-8 space-y-6">
