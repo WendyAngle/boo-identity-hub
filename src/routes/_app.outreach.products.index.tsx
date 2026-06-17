@@ -22,7 +22,7 @@ import {
   type L4Item,
 } from "@/data/products-catalog";
 
-export const Route = createFileRoute("/_app/outreach/products")({
+export const Route = createFileRoute("/_app/outreach/products/")({
   head: () => ({ meta: [{ title: "触达客户管理 · 商品 | Boo数据平台" }] }),
   component: ProductsPage,
 });
