@@ -191,13 +191,13 @@ function ProductDetailPage() {
                   <stop offset="100%" stopColor="hsl(184 70% 42%)" stopOpacity={0.02} />
                 </linearGradient>
               </defs>
-              <CartesianGrid stroke="hsl(var(--border))" strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="m" stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
-              <YAxis stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} tickFormatter={(v) => `${(v / 10000).toFixed(0)}万+`} />
+              <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" vertical={false} />
+              <XAxis dataKey="m" stroke="#94a3b8" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+              <YAxis stroke="#94a3b8" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} tickFormatter={(v) => `${(v / 100).toFixed(0)}万+`} />
               <RTooltip
                 contentStyle={{
-                  background: "hsl(var(--popover))",
-                  border: "1px solid hsl(var(--border))",
+                  background: "white",
+                  border: "1px solid #e2e8f0",
                   borderRadius: 8,
                   fontSize: 12,
                 }}
