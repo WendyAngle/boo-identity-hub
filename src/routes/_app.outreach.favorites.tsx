@@ -609,13 +609,13 @@ function useTarget(
   | { kind: "bill" }
   | null {
   if (r.kind === "enterprise") return { kind: "enterprise", id: r.refId };
-  if (r.kind === "contact" && r.parentRef) {
-    const contactIdx = r.refId.split(":")[1];
-    return {
-      kind: "contact",
-      id: r.parentRef.id,
-      idx: contactIdx ?? "0",
-    };
+  if (r.kind === "contact") {
+    // refId 形如 "<entId>:<idx>"；优先用 parentRef.id 作为企业 id
+    const parts = r.refId.split(":");
+    const entId = r.parentRef?.id ?? parts[0];
+    const contactIdx = parts[1] ?? "0";
+    if (!entId) return null;
+    return { kind: "contact", id: entId, idx: contactIdx };
   }
   if (r.kind === "product") return { kind: "product", id: r.refId };
   if (r.kind === "bill") return { kind: "bill" };
