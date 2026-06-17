@@ -19,6 +19,7 @@ import { Route as AppOutreachFootprintsRouteImport } from './routes/_app.outreac
 import { Route as AppOutreachFavoritesRouteImport } from './routes/_app.outreach.favorites'
 import { Route as AppOutreachEnterpriseRouteImport } from './routes/_app.outreach.enterprise'
 import { Route as AppOutreachBillsRouteImport } from './routes/_app.outreach.bills'
+import { Route as AppOutreachBillingRouteImport } from './routes/_app.outreach.billing'
 import { Route as AppAuthUserRouteImport } from './routes/_app.auth.user'
 import { Route as AppOutreachProductsIndexRouteImport } from './routes/_app.outreach.products.index'
 import { Route as AppOutreachEnterpriseIndexRouteImport } from './routes/_app.outreach.enterprise.index'
@@ -77,6 +78,11 @@ const AppOutreachEnterpriseRoute = AppOutreachEnterpriseRouteImport.update({
 const AppOutreachBillsRoute = AppOutreachBillsRouteImport.update({
   id: '/outreach/bills',
   path: '/outreach/bills',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppOutreachBillingRoute = AppOutreachBillingRouteImport.update({
+  id: '/outreach/billing',
+  path: '/outreach/billing',
   getParentRoute: () => AppRoute,
 } as any)
 const AppAuthUserRoute = AppAuthUserRouteImport.update({
@@ -138,6 +144,7 @@ const AppAuthUserUsersRoute = AppAuthUserUsersRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/auth/user': typeof AppAuthUserRouteWithChildren
+  '/outreach/billing': typeof AppOutreachBillingRoute
   '/outreach/bills': typeof AppOutreachBillsRoute
   '/outreach/enterprise': typeof AppOutreachEnterpriseRouteWithChildren
   '/outreach/favorites': typeof AppOutreachFavoritesRoute
@@ -159,6 +166,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof AppIndexRoute
   '/auth/user': typeof AppAuthUserRouteWithChildren
+  '/outreach/billing': typeof AppOutreachBillingRoute
   '/outreach/bills': typeof AppOutreachBillsRoute
   '/outreach/favorites': typeof AppOutreachFavoritesRoute
   '/outreach/footprints': typeof AppOutreachFootprintsRoute
@@ -181,6 +189,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/_app/': typeof AppIndexRoute
   '/_app/auth/user': typeof AppAuthUserRouteWithChildren
+  '/_app/outreach/billing': typeof AppOutreachBillingRoute
   '/_app/outreach/bills': typeof AppOutreachBillsRoute
   '/_app/outreach/enterprise': typeof AppOutreachEnterpriseRouteWithChildren
   '/_app/outreach/favorites': typeof AppOutreachFavoritesRoute
@@ -204,6 +213,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth/user'
+    | '/outreach/billing'
     | '/outreach/bills'
     | '/outreach/enterprise'
     | '/outreach/favorites'
@@ -225,6 +235,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth/user'
+    | '/outreach/billing'
     | '/outreach/bills'
     | '/outreach/favorites'
     | '/outreach/footprints'
@@ -246,6 +257,7 @@ export interface FileRouteTypes {
     | '/_app'
     | '/_app/'
     | '/_app/auth/user'
+    | '/_app/outreach/billing'
     | '/_app/outreach/bills'
     | '/_app/outreach/enterprise'
     | '/_app/outreach/favorites'
@@ -339,6 +351,13 @@ declare module '@tanstack/react-router' {
       path: '/outreach/bills'
       fullPath: '/outreach/bills'
       preLoaderRoute: typeof AppOutreachBillsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/outreach/billing': {
+      id: '/_app/outreach/billing'
+      path: '/outreach/billing'
+      fullPath: '/outreach/billing'
+      preLoaderRoute: typeof AppOutreachBillingRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/auth/user': {
@@ -444,6 +463,7 @@ const AppOutreachEnterpriseRouteWithChildren =
 interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
   AppAuthUserRoute: typeof AppAuthUserRouteWithChildren
+  AppOutreachBillingRoute: typeof AppOutreachBillingRoute
   AppOutreachBillsRoute: typeof AppOutreachBillsRoute
   AppOutreachEnterpriseRoute: typeof AppOutreachEnterpriseRouteWithChildren
   AppOutreachFavoritesRoute: typeof AppOutreachFavoritesRoute
@@ -463,6 +483,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
   AppAuthUserRoute: AppAuthUserRouteWithChildren,
+  AppOutreachBillingRoute: AppOutreachBillingRoute,
   AppOutreachBillsRoute: AppOutreachBillsRoute,
   AppOutreachEnterpriseRoute: AppOutreachEnterpriseRouteWithChildren,
   AppOutreachFavoritesRoute: AppOutreachFavoritesRoute,
