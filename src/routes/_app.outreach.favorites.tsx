@@ -492,6 +492,17 @@ function FavoriteCard({
       </Link>
     );
   }
+  if (target.kind === "contact") {
+    return (
+      <Link
+        to="/outreach/enterprise/$id/contact/$idx"
+        params={{ id: target.id, idx: target.idx }}
+        className="group block"
+      >
+        {inner}
+      </Link>
+    );
+  }
   if (target.kind === "product") {
     return (
       <Link to="/outreach/products/$hs" params={{ hs: target.id }} className="group block">
