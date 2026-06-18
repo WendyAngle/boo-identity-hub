@@ -72,7 +72,7 @@ import {
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/outreach/users")({
-  head: () => ({ meta: [{ title: "触达客户管理 · 用户管理 | Boo数据平台" }] }),
+  head: () => ({ meta: [{ title: "出海大数据平台 · 用户管理 | Boo数据平台" }] }),
   component: UserSideUsersPage,
 });
 
@@ -241,7 +241,7 @@ function UserSideUsersPage() {
     <div className="p-8 space-y-6">
       {/* Breadcrumb */}
       <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-        <span>触达客户管理</span>
+        <span>出海大数据平台</span>
         <ChevronRight className="h-3.5 w-3.5" />
         <span className="text-foreground font-medium">用户管理</span>
       </div>
