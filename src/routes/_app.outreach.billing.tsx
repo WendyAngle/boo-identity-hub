@@ -464,6 +464,14 @@ function BillingPage() {
                 </span>
               </span>
             )}
+            {filteredRecharge > 0 && (
+              <span>
+                充值{" "}
+                <span className="font-semibold text-emerald-600 tabular-nums">
+                  +{filteredRecharge}
+                </span>
+              </span>
+            )}
           </div>
         </div>
 
