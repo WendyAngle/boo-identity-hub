@@ -148,6 +148,14 @@ function RechargePage() {
     window.setTimeout(() => {
       const no = fmtOrderNo();
       addCredits(totalCredits);
+      recordRecharge({
+        orderNo: no,
+        packageLabel: order.label,
+        credits: order.credits,
+        bonus: order.bonus,
+        price: order.price,
+        paymentMethod: method,
+      });
       setLastOrder({ no, credits: totalCredits, price: order.price });
       setPaying(false);
       toast.success("充值成功（演示）", {
