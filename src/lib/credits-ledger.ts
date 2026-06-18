@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
 
-export type LedgerKind = "view" | "reach" | "refund";
+export type LedgerKind = "view" | "reach" | "refund" | "recharge";
 export type ViewField =
   | "email"
   | "phone"
@@ -36,10 +36,15 @@ export interface LedgerEntry {
   failReason?: string;
   // refund-only: id of the related reach entry being refunded
   relatedReachId?: string;
+  // recharge-only
+  orderNo?: string;
+  paymentMethod?: "wechat" | "alipay" | "corp";
+  bonus?: number;
+  price?: number;
 }
 
 const LEDGER_KEY = "boo:ledger:v1";
-const LEDGER_SEED_FLAG = "boo:ledger:v3:seeded";
+const LEDGER_SEED_FLAG = "boo:ledger:v4:seeded";
 const REVEAL_KEY = "boo:reveal:v1";
 
 /* -------------------- ledger store -------------------- */
