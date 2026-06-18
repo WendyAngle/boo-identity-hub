@@ -561,12 +561,10 @@ function StatusBadge({ status }: { status: ReachStatus }) {
 function ActionCell({
   row,
   onTrigger,
-  onCancel,
   onRetry,
 }: {
   row: { id: string; status: ReachStatus };
   onTrigger: () => void;
-  onCancel: () => void;
   onRetry: () => void;
 }) {
   if (row.status === "pending") {
@@ -580,15 +578,6 @@ function ActionCell({
         >
           <Play className="h-3 w-3" />
           立即触达
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          className="h-7 gap-1 px-2 text-xs text-muted-foreground hover:text-destructive hover:border-destructive/40"
-          onClick={onCancel}
-        >
-          <Ban className="h-3 w-3" />
-          取消
         </Button>
       </div>
     );
