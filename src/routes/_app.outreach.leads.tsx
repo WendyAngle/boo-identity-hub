@@ -187,6 +187,16 @@ function AiTab({ onGoProfile }: { onGoProfile: () => void }) {
   const [view, setView] = useState<AiView>("new");
   const [filteredOut, setFilteredOut] = useState(0);
   const fb = useLeadFeedbackState();
+  const [profileDirty, setProfileDirty] = useState(false);
+
+  // 画像被 inline 修改后，提示用户重新生成；leads 已存在才有意义
+  const handleProfilePatch = <K extends keyof LeadProfile>(
+    key: K,
+    value: LeadProfile[K],
+  ) => {
+    saveProfile({ ...profile, [key]: value });
+    if (leads.length > 0) setProfileDirty(true);
+  };
 
   const handleGenerate = () => {
     if (quotaLeft <= 0) {
