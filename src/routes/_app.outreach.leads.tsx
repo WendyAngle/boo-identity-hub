@@ -583,7 +583,9 @@ function SearchTab() {
       {loading && (
         <Card className="p-12 text-center border-dashed">
           <Loader2 className="h-7 w-7 mx-auto text-primary animate-spin" />
-          <div className="mt-3 font-medium">正在为「{activeKw}」匹配线索…</div>
+          <div className="mt-3 font-medium">
+            正在为「{activeKwJoined}」匹配线索…
+          </div>
           <div className="text-xs text-muted-foreground mt-1">
             扫描企业库、贸易记录与联系方式
           </div>
@@ -593,16 +595,25 @@ function SearchTab() {
       {hasSearched && hasResults && (
         <>
           <Card className="px-5 py-3 flex flex-wrap items-center gap-3 bg-primary/[0.04] border-primary/15">
-            <div className="flex items-center gap-2 text-sm">
-              <Search className="h-4 w-4 text-primary" />
-              <span>
+            <div className="flex items-center gap-2 text-sm flex-wrap">
+              <Search className="h-4 w-4 text-primary shrink-0" />
+              <span className="shrink-0">
                 找到{" "}
                 <span className="font-semibold text-primary tabular-nums">
                   {results.length}
                 </span>{" "}
                 条线索 · 关键词
-                <span className="text-foreground font-medium">「{activeKw}」</span>
               </span>
+              <div className="flex flex-wrap gap-1">
+                {activeKws.map((w) => (
+                  <span
+                    key={w}
+                    className="inline-flex items-center px-2 h-5 rounded-full text-[11px] bg-primary/10 text-primary font-medium"
+                  >
+                    {w}
+                  </span>
+                ))}
+              </div>
             </div>
             <div className="ml-auto flex items-center gap-2">
               <button
@@ -613,7 +624,7 @@ function SearchTab() {
               </button>
               <Link
                 to="/outreach/enterprise"
-                search={{ q: activeKw }}
+                search={{ q: activeKws.join(" ") }}
                 className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
               >
                 在企业库中查看完整结果 <ChevronRight className="h-3.5 w-3.5" />
@@ -635,13 +646,13 @@ function SearchTab() {
             <Search className="h-7 w-7" />
           </div>
           <div className="font-medium">
-            没有找到与「{activeKw}」匹配的线索
+            没有找到与「{activeKwJoined}」匹配的线索
           </div>
           <div className="text-sm text-muted-foreground mt-1">
             建议放宽搜索类型 · 换个关键词 · 或前往
             <Link
               to="/outreach/enterprise"
-              search={{ q: activeKw }}
+              search={{ q: activeKws.join(" ") }}
               className="text-primary hover:underline mx-1"
             >
               企业库
