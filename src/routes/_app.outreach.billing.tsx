@@ -92,6 +92,7 @@ function fmtTime(iso: string) {
 }
 
 function BillingPage() {
+  const { tab: tabFromUrl } = Route.useSearch();
   useEffect(() => {
     seedDemoLedgerIfEmpty();
     syncFailedRefunds();
@@ -103,7 +104,7 @@ function BillingPage() {
   const lowBalance = isBalanceLow(balance);
   const expiringSoon = isExpiringSoon(balance);
 
-  const [tab, setTab] = useState<"all" | LedgerKind>("all");
+  const [tab, setTab] = useState<"all" | LedgerKind>(tabFromUrl ?? "all");
   const [kw, setKw] = useState("");
   const [datePreset, setDatePreset] = useState<PresetId>("all");
   const [customRange, setCustomRange] = useState<DateRangeValue>(undefined);
