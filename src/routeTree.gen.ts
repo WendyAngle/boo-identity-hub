@@ -17,6 +17,7 @@ import { Route as AppPointsAppsRouteImport } from './routes/_app.points.apps'
 import { Route as AppOutreachUsersRouteImport } from './routes/_app.outreach.users'
 import { Route as AppOutreachSearchRouteImport } from './routes/_app.outreach.search'
 import { Route as AppOutreachRechargeRouteImport } from './routes/_app.outreach.recharge'
+import { Route as AppOutreachSearchRouteImport } from './routes/_app.outreach.search'
 import { Route as AppOutreachReachEmptyRouteImport } from './routes/_app.outreach.reach-empty'
 import { Route as AppOutreachReachRouteImport } from './routes/_app.outreach.reach'
 import { Route as AppOutreachLeadsRouteImport } from './routes/_app.outreach.leads'
@@ -77,6 +78,11 @@ const AppOutreachSearchRoute = AppOutreachSearchRouteImport.update({
 const AppOutreachRechargeRoute = AppOutreachRechargeRouteImport.update({
   id: '/outreach/recharge',
   path: '/outreach/recharge',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppOutreachSearchRoute = AppOutreachSearchRouteImport.update({
+  id: '/outreach/search',
+  path: '/outreach/search',
   getParentRoute: () => AppRoute,
 } as any)
 const AppOutreachReachEmptyRoute = AppOutreachReachEmptyRouteImport.update({
@@ -447,6 +453,13 @@ declare module '@tanstack/react-router' {
       path: '/outreach/recharge'
       fullPath: '/outreach/recharge'
       preLoaderRoute: typeof AppOutreachRechargeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/outreach/search': {
+      id: '/_app/outreach/search'
+      path: '/outreach/search'
+      fullPath: '/outreach/search'
+      preLoaderRoute: typeof AppOutreachSearchRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/outreach/reach-empty': {
