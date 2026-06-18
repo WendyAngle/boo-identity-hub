@@ -585,7 +585,7 @@ function BillingPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((e) => (
+              {pageData.map((e) => (
                 <TableRow key={e.id} className="hover:bg-muted/30">
                   <TableCell className="font-mono tabular-nums text-xs text-muted-foreground">
                     {fmtTime(e.createdAt)}
@@ -619,6 +619,16 @@ function BillingPage() {
               ))}
             </TableBody>
           </Table>
+        )}
+        {filtered.length > 0 && (
+          <div className="px-5 pb-4">
+            <ListPagination
+              page={page}
+              pageSize={pageSize}
+              total={filtered.length}
+              onPageChange={setPage}
+            />
+          </div>
         )}
       </Card>
       <RulesSheet open={rulesOpen} onOpenChange={setRulesOpen} />
