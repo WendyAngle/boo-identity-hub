@@ -575,6 +575,7 @@ function AiTab({ onGoProfile }: { onGoProfile: () => void }) {
   const [filteredOut, setFilteredOut] = useState(0);
   const fb = useLeadFeedbackState();
   const [profileDirty, setProfileDirty] = useState(false);
+  const [packsOpen, setPacksOpen] = useState(false);
 
   // 画像被 inline 修改后，提示用户重新生成；leads 已存在才有意义
   const handleProfilePatch = <K extends keyof LeadProfile>(
