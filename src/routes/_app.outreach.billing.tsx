@@ -315,7 +315,7 @@ function BillingPage() {
         </div>
       </section>
 
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
         <StatCard
           icon={<Wallet className="h-5 w-5" />}
           label="净消耗"
@@ -341,6 +341,14 @@ function BillingPage() {
           icon={<Undo2 className="h-5 w-5" />}
           label="失败退还"
           value={stats.refund}
+          unit="积分"
+          tone="emerald"
+          positive
+        />
+        <StatCard
+          icon={<Wallet className="h-5 w-5" />}
+          label="累计充值"
+          value={stats.recharge}
           unit="积分"
           tone="emerald"
           positive
