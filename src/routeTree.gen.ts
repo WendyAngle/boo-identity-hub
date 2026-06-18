@@ -16,7 +16,6 @@ import { Route as AppPointsTenantsRouteImport } from './routes/_app.points.tenan
 import { Route as AppPointsAppsRouteImport } from './routes/_app.points.apps'
 import { Route as AppOutreachUsersRouteImport } from './routes/_app.outreach.users'
 import { Route as AppOutreachRechargeRouteImport } from './routes/_app.outreach.recharge'
-import { Route as AppOutreachInvoicesRouteImport } from './routes/_app.outreach.invoices'
 import { Route as AppOutreachReachEmptyRouteImport } from './routes/_app.outreach.reach-empty'
 import { Route as AppOutreachReachRouteImport } from './routes/_app.outreach.reach'
 import { Route as AppOutreachLeadsRouteImport } from './routes/_app.outreach.leads'
@@ -72,11 +71,6 @@ const AppOutreachUsersRoute = AppOutreachUsersRouteImport.update({
 const AppOutreachRechargeRoute = AppOutreachRechargeRouteImport.update({
   id: '/outreach/recharge',
   path: '/outreach/recharge',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppOutreachInvoicesRoute = AppOutreachInvoicesRouteImport.update({
-  id: '/outreach/invoices',
-  path: '/outreach/invoices',
   getParentRoute: () => AppRoute,
 } as any)
 const AppOutreachReachEmptyRoute = AppOutreachReachEmptyRouteImport.update({
@@ -214,7 +208,6 @@ export interface FileRoutesByFullPath {
   '/outreach/reach': typeof AppOutreachReachRoute
   '/outreach/reach-empty': typeof AppOutreachReachEmptyRoute
   '/outreach/recharge': typeof AppOutreachRechargeRoute
-  '/outreach/invoices': typeof AppOutreachInvoicesRoute
   '/outreach/users': typeof AppOutreachUsersRoute
   '/points/apps': typeof AppPointsAppsRoute
   '/points/tenants': typeof AppPointsTenantsRoute
