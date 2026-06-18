@@ -208,7 +208,6 @@ export interface FileRoutesByFullPath {
   '/outreach/reach': typeof AppOutreachReachRoute
   '/outreach/reach-empty': typeof AppOutreachReachEmptyRoute
   '/outreach/recharge': typeof AppOutreachRechargeRoute
-  '/outreach/invoices': typeof AppOutreachInvoicesRoute
   '/outreach/users': typeof AppOutreachUsersRoute
   '/points/apps': typeof AppPointsAppsRoute
   '/points/tenants': typeof AppPointsTenantsRoute
@@ -269,7 +268,6 @@ export interface FileRoutesById {
   '/_app/outreach/reach': typeof AppOutreachReachRoute
   '/_app/outreach/reach-empty': typeof AppOutreachReachEmptyRoute
   '/_app/outreach/recharge': typeof AppOutreachRechargeRoute
-  '/_app/outreach/invoices': typeof AppOutreachInvoicesRoute
   '/_app/outreach/users': typeof AppOutreachUsersRoute
   '/_app/points/apps': typeof AppPointsAppsRoute
   '/_app/points/tenants': typeof AppPointsTenantsRoute
@@ -302,7 +300,6 @@ export interface FileRouteTypes {
     | '/outreach/reach'
     | '/outreach/reach-empty'
     | '/outreach/recharge'
-    | '/outreach/invoices'
     | '/outreach/users'
     | '/points/apps'
     | '/points/tenants'
@@ -332,7 +329,6 @@ export interface FileRouteTypes {
     | '/outreach/reach'
     | '/outreach/reach-empty'
     | '/outreach/recharge'
-    | '/outreach/invoices'
     | '/outreach/users'
     | '/points/apps'
     | '/points/tenants'
@@ -363,7 +359,6 @@ export interface FileRouteTypes {
     | '/_app/outreach/reach'
     | '/_app/outreach/reach-empty'
     | '/_app/outreach/recharge'
-    | '/_app/outreach/invoices'
     | '/_app/outreach/users'
     | '/_app/points/apps'
     | '/_app/points/tenants'
@@ -433,13 +428,6 @@ declare module '@tanstack/react-router' {
       path: '/outreach/recharge'
       fullPath: '/outreach/recharge'
       preLoaderRoute: typeof AppOutreachRechargeRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/outreach/invoices': {
-      id: '/_app/outreach/invoices'
-      path: '/outreach/invoices'
-      fullPath: '/outreach/invoices'
-      preLoaderRoute: typeof AppOutreachInvoicesRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/outreach/reach-empty': {
@@ -646,7 +634,6 @@ interface AppRouteChildren {
   AppOutreachReachRoute: typeof AppOutreachReachRoute
   AppOutreachReachEmptyRoute: typeof AppOutreachReachEmptyRoute
   AppOutreachRechargeRoute: typeof AppOutreachRechargeRoute
-  AppOutreachInvoicesRoute: typeof AppOutreachInvoicesRoute
   AppOutreachUsersRoute: typeof AppOutreachUsersRoute
   AppPointsAppsRoute: typeof AppPointsAppsRoute
   AppPointsTenantsRoute: typeof AppPointsTenantsRoute
@@ -674,7 +661,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppOutreachReachRoute: AppOutreachReachRoute,
   AppOutreachReachEmptyRoute: AppOutreachReachEmptyRoute,
   AppOutreachRechargeRoute: AppOutreachRechargeRoute,
-  AppOutreachInvoicesRoute: AppOutreachInvoicesRoute,
   AppOutreachUsersRoute: AppOutreachUsersRoute,
   AppPointsAppsRoute: AppPointsAppsRoute,
   AppPointsTenantsRoute: AppPointsTenantsRoute,
