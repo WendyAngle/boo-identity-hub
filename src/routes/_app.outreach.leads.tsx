@@ -447,10 +447,14 @@ type SearchType = (typeof SEARCH_TYPES)[number]["key"];
 const HOT = ["纺织面料", "led 灯具", "皮革", "680100", "厨房用具", "汽配"];
 
 function SearchTab() {
-  const navigate = useNavigate();
   const [type, setType] = useState<SearchType>("all");
   const [kw, setKw] = useState("");
-  const history = useMemo(() => getSearchHistory(), [type]);
+  const [loading, setLoading] = useState(false);
+  const [results, setResults] = useState<LeadItem[]>([]);
+  const [activeKw, setActiveKw] = useState("");
+  const [activeType, setActiveType] = useState<SearchType>("all");
+  const [historyTick, setHistoryTick] = useState(0);
+  const history = useMemo(() => getSearchHistory(), [historyTick, results]);
 
   const submit = (override?: { type?: SearchType; kw?: string }) => {
     const t = override?.type ?? type;
@@ -460,20 +464,29 @@ function SearchTab() {
       return;
     }
     pushSearchHistory(word);
-    if (t === "hs" || /^\d{4,10}$/.test(word)) {
-      navigate({ to: "/outreach/enterprise", search: { hs: word } });
-      return;
-    }
-    if (t === "product") {
-      navigate({ to: "/outreach/enterprise", search: { product: word } });
-      return;
-    }
-    // enterprise / all -> 企业列表（关键字搜索由企业页处理）
-    navigate({ to: "/outreach/enterprise", search: {} });
-    toast.message(`已跳转至企业库，当前关键词：${word}`, {
-      description: "请在企业库搜索框继续筛选",
-    });
+    setHistoryTick((n) => n + 1);
+    setActiveKw(word);
+    setActiveType(t);
+    if (override?.kw !== undefined) setKw(word);
+    if (override?.type !== undefined) setType(t);
+    setLoading(true);
+    setTimeout(() => {
+      const r = searchLeads(word, t, 12);
+      setResults(r);
+      setLoading(false);
+    }, 500);
   };
+
+  const clear = () => {
+    setResults([]);
+    setActiveKw("");
+    setLoading(false);
+  };
+
+  const hasResults = results.length > 0;
+  const hasSearched = activeKw !== "" && !loading;
+  const typeLabel =
+    SEARCH_TYPES.find((s) => s.key === activeType)?.label ?? "全部";
 
   return (
     <div className="space-y-5">
