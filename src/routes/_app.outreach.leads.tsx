@@ -45,6 +45,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { FavoriteToggle } from "@/components/FavoriteToggle";
 import { MaskedField } from "@/components/MaskedField";
 import { ReachButton } from "@/components/ReachButton";
@@ -158,6 +163,371 @@ function LeadsPage() {
 
 type AiView = "new" | "seen" | "ignored";
 
+/* ---------- 画像健康度卡片（inline 快速补全） ---------- */
+
+const AI_SCALE_OPTIONS = ["1-50", "51-200", "201-1000", "1000+"];
+const AI_REVENUE_OPTIONS = [
+  "<500 万",
+  "500 万 - 5000 万",
+  "5000 万 - 5 亿",
+  ">5 亿",
+];
+
+type ProfileFieldMeta =
+  | {
+      key: keyof LeadProfile;
+      label: string;
+      weight: number;
+      type: "array";
+      placeholder: string;
+      mono?: boolean;
+    }
+  | {
+      key: keyof LeadProfile;
+      label: string;
+      weight: number;
+      type: "enum";
+      options: string[];
+    }
+  | {
+      key: keyof LeadProfile;
+      label: string;
+      weight: number;
+      type: "text";
+      placeholder: string;
+      multiline?: boolean;
+    };
+
+const PROFILE_FIELDS: ProfileFieldMeta[] = [
+  { key: "mainProducts", label: "主营产品", weight: 14, type: "array", placeholder: "输入产品名后回车" },
+  { key: "targetCountries", label: "目标国家 / 地区", weight: 14, type: "array", placeholder: "输入国家或地区后回车" },
+  { key: "industries", label: "所属行业", weight: 12, type: "array", placeholder: "输入行业名后回车" },
+  { key: "hsCodes", label: "HS 编码", weight: 10, type: "array", placeholder: "输入 HS 编码后回车", mono: true },
+  { key: "targetIndustries", label: "目标客户行业", weight: 10, type: "array", placeholder: "输入目标行业后回车" },
+  { key: "competitors", label: "核心竞品", weight: 10, type: "array", placeholder: "输入竞品企业名后回车" },
+  { key: "scale", label: "企业规模", weight: 6, type: "enum", options: AI_SCALE_OPTIONS },
+  { key: "revenue", label: "年营业额", weight: 6, type: "enum", options: AI_REVENUE_OPTIONS },
+  { key: "targetScale", label: "目标客户规模", weight: 6, type: "enum", options: AI_SCALE_OPTIONS },
+  { key: "advantage", label: "差异化优势", weight: 4, type: "text", placeholder: "简述核心差异化优势", multiline: true },
+  { key: "website", label: "企业官网", weight: 2, type: "text", placeholder: "https://" },
+  { key: "brandStory", label: "品牌故事", weight: 2, type: "text", placeholder: "一句话品牌故事", multiline: true },
+  { key: "certifications", label: "资质证书", weight: 2, type: "array", placeholder: "输入证书名后回车" },
+  { key: "exportQualifications", label: "出口资质", weight: 2, type: "array", placeholder: "输入出口资质后回车" },
+];
+
+function isFieldMissing(p: LeadProfile, f: ProfileFieldMeta): boolean {
+  const v = p[f.key];
+  if (Array.isArray(v)) return v.length === 0;
+  return !v;
+}
+
+function ProfileHealthCard({
+  profile,
+  completeness,
+  onPatch,
+  onOpenFull,
+}: {
+  profile: LeadProfile;
+  completeness: number;
+  onPatch: <K extends keyof LeadProfile>(k: K, v: LeadProfile[K]) => void;
+  onOpenFull: () => void;
+}) {
+  const missing = PROFILE_FIELDS.filter((f) => isFieldMissing(profile, f));
+  const topMissing = missing.slice(0, 4);
+  const potentialGain = missing.reduce((s, f) => s + f.weight, 0);
+
+  return (
+    <Card className="p-5 space-y-4">
+      {/* 头部摘要 */}
+      <div className="flex flex-col md:flex-row gap-4 md:items-center">
+        <div className="flex items-start gap-4 flex-1 min-w-0">
+          <div className="h-12 w-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center ring-1 ring-primary/20 shrink-0">
+            <Target className="h-6 w-6" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <div className="font-semibold">当前企业画像</div>
+              <Badge
+                variant="secondary"
+                className="text-[10px] bg-primary/10 text-primary"
+              >
+                完整度 {completeness}%
+              </Badge>
+              {missing.length === 0 && (
+                <Badge
+                  variant="secondary"
+                  className="text-[10px] bg-emerald-100 text-emerald-700"
+                >
+                  画像已完善
+                </Badge>
+              )}
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground flex flex-wrap gap-x-3 gap-y-1">
+              <span>
+                行业：
+                <span className="text-foreground">
+                  {profile.industries.join("、") || "未填写"}
+                </span>
+              </span>
+              <span>
+                主营：
+                <span className="text-foreground">
+                  {profile.mainProducts.join("、") || "未填写"}
+                </span>
+              </span>
+              <span>
+                目标市场：
+                <span className="text-foreground">
+                  {profile.targetCountries.join("、") || "未填写"}
+                </span>
+              </span>
+            </div>
+            <Progress value={completeness} className="mt-2 h-1.5" />
+          </div>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onOpenFull}
+            className="gap-1.5 text-muted-foreground hover:text-foreground"
+          >
+            <Wand2 className="h-4 w-4" />
+            打开完整表单
+            <ChevronRight className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+      </div>
+
+      {/* 缺失项 inline 快速补全 */}
+      {topMissing.length > 0 && (
+        <div className="rounded-lg bg-muted/40 border border-dashed p-3 space-y-2">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Sparkles className="h-3.5 w-3.5 text-primary" />
+            <span>
+              还差 <b className="text-foreground tabular-nums">{missing.length}</b> 项可达
+              <b className="text-foreground tabular-nums"> {Math.min(100, completeness + potentialGain)}%</b>
+              ，就地补全即可提升推荐精准度
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {topMissing.map((f) => (
+              <QuickFillRow
+                key={f.key as string}
+                field={f}
+                profile={profile}
+                onPatch={onPatch}
+              />
+            ))}
+          </div>
+          {missing.length > topMissing.length && (
+            <button
+              type="button"
+              onClick={onOpenFull}
+              className="text-xs text-primary hover:underline"
+            >
+              还有 {missing.length - topMissing.length} 项 →
+            </button>
+          )}
+        </div>
+      )}
+    </Card>
+  );
+}
+
+function QuickFillRow({
+  field,
+  profile,
+  onPatch,
+}: {
+  field: ProfileFieldMeta;
+  profile: LeadProfile;
+  onPatch: <K extends keyof LeadProfile>(k: K, v: LeadProfile[K]) => void;
+}) {
+  return (
+    <div className="flex items-center gap-2 bg-background rounded-md px-2.5 py-1.5 border">
+      <div className="text-xs text-foreground flex-1 min-w-0 truncate">
+        {field.label}
+      </div>
+      <Badge
+        variant="secondary"
+        className="text-[10px] bg-primary/10 text-primary tabular-nums"
+      >
+        +{field.weight}%
+      </Badge>
+      {field.type === "enum" ? (
+        <Select
+          value={(profile[field.key] as string) || ""}
+          onValueChange={(v) => onPatch(field.key, v as LeadProfile[typeof field.key])}
+        >
+          <SelectTrigger className="h-7 w-[120px] text-xs">
+            <SelectValue placeholder="选择" />
+          </SelectTrigger>
+          <SelectContent>
+            {field.options.map((o) => (
+              <SelectItem key={o} value={o} className="text-xs">{o}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      ) : field.type === "array" ? (
+        <QuickArrayPopover field={field} profile={profile} onPatch={onPatch} />
+      ) : (
+        <QuickTextPopover field={field} profile={profile} onPatch={onPatch} />
+      )}
+    </div>
+  );
+}
+
+function QuickArrayPopover({
+  field,
+  profile,
+  onPatch,
+}: {
+  field: Extract<ProfileFieldMeta, { type: "array" }>;
+  profile: LeadProfile;
+  onPatch: <K extends keyof LeadProfile>(k: K, v: LeadProfile[K]) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [input, setInput] = useState("");
+  const current = (profile[field.key] as string[]) || [];
+
+  const add = () => {
+    const v = input.trim();
+    if (!v) return;
+    if (current.includes(v)) {
+      setInput("");
+      return;
+    }
+    onPatch(field.key, [...current, v] as LeadProfile[typeof field.key]);
+    setInput("");
+  };
+
+  const remove = (i: number) => {
+    const next = current.filter((_, idx) => idx !== i);
+    onPatch(field.key, next as LeadProfile[typeof field.key]);
+  };
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button size="sm" variant="outline" className="h-7 px-2 gap-1 text-xs">
+          <Plus className="h-3 w-3" /> 添加
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-72 p-3 space-y-2">
+        <div className="text-xs font-medium">{field.label}</div>
+        <div className="flex gap-1.5">
+          <Input
+            autoFocus
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                add();
+              } else if (e.key === "Escape") {
+                setOpen(false);
+              }
+            }}
+            placeholder={field.placeholder}
+            className={field.mono ? "h-8 text-xs font-mono" : "h-8 text-xs"}
+          />
+          <Button size="sm" className="h-8" onClick={add}>添加</Button>
+        </div>
+        {current.length > 0 && (
+          <div className="flex flex-wrap gap-1 pt-1">
+            {current.map((v, i) => (
+              <Badge
+                key={`${v}-${i}`}
+                variant="secondary"
+                className={`gap-1 ${field.mono ? "font-mono" : ""}`}
+              >
+                {v}
+                <button
+                  type="button"
+                  onClick={() => remove(i)}
+                  className="hover:text-destructive"
+                  aria-label="移除"
+                >
+                  <XIcon className="h-3 w-3" />
+                </button>
+              </Badge>
+            ))}
+          </div>
+        )}
+        <div className="text-[10px] text-muted-foreground pt-1">
+          回车快速添加，Esc 关闭
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function QuickTextPopover({
+  field,
+  profile,
+  onPatch,
+}: {
+  field: Extract<ProfileFieldMeta, { type: "text" }>;
+  profile: LeadProfile;
+  onPatch: <K extends keyof LeadProfile>(k: K, v: LeadProfile[K]) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [val, setVal] = useState((profile[field.key] as string) || "");
+
+  useEffect(() => {
+    if (open) setVal((profile[field.key] as string) || "");
+  }, [open, profile, field.key]);
+
+  const save = () => {
+    onPatch(field.key, val.trim() as LeadProfile[typeof field.key]);
+    setOpen(false);
+  };
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button size="sm" variant="outline" className="h-7 px-2 gap-1 text-xs">
+          <Plus className="h-3 w-3" /> 填写
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-80 p-3 space-y-2">
+        <div className="text-xs font-medium">{field.label}</div>
+        {field.multiline ? (
+          <Textarea
+            autoFocus
+            value={val}
+            onChange={(e) => setVal(e.target.value)}
+            placeholder={field.placeholder}
+            rows={3}
+            className="text-xs"
+          />
+        ) : (
+          <Input
+            autoFocus
+            value={val}
+            onChange={(e) => setVal(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                save();
+              }
+            }}
+            placeholder={field.placeholder}
+            className="h-8 text-xs"
+          />
+        )}
+        <div className="flex justify-end gap-1.5 pt-1">
+          <Button size="sm" variant="ghost" className="h-7" onClick={() => setOpen(false)}>
+            取消
+          </Button>
+          <Button size="sm" className="h-7" onClick={save}>保存</Button>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 function useLeadFeedbackState(): LeadFeedback {
   const [fb, setFb] = useState<LeadFeedback>(() => getLeadFeedback());
   useEffect(() => {
@@ -182,6 +552,16 @@ function AiTab({ onGoProfile }: { onGoProfile: () => void }) {
   const [view, setView] = useState<AiView>("new");
   const [filteredOut, setFilteredOut] = useState(0);
   const fb = useLeadFeedbackState();
+  const [profileDirty, setProfileDirty] = useState(false);
+
+  // 画像被 inline 修改后，提示用户重新生成；leads 已存在才有意义
+  const handleProfilePatch = <K extends keyof LeadProfile>(
+    key: K,
+    value: LeadProfile[K],
+  ) => {
+    saveProfile({ ...profile, [key]: value });
+    if (leads.length > 0) setProfileDirty(true);
+  };
 
   const handleGenerate = () => {
     if (quotaLeft <= 0) {
@@ -293,51 +673,12 @@ function AiTab({ onGoProfile }: { onGoProfile: () => void }) {
   return (
     <div className="space-y-5">
       {/* 画像摘要 + 操作 */}
-      <Card className="p-5 flex flex-col md:flex-row gap-5 items-stretch md:items-center">
-        <div className="flex items-start gap-4 flex-1 min-w-0">
-          <div className="h-12 w-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center ring-1 ring-primary/20 shrink-0">
-            <Target className="h-6 w-6" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <div className="font-semibold">当前企业画像</div>
-              <Badge
-                variant="secondary"
-                className="text-[10px] bg-primary/10 text-primary"
-              >
-                完整度 {completeness}%
-              </Badge>
-            </div>
-            <div className="mt-1 text-xs text-muted-foreground flex flex-wrap gap-x-3 gap-y-1">
-              <span>
-                行业：
-                <span className="text-foreground">
-                  {profile.industries.join("、") || "未填写"}
-                </span>
-              </span>
-              <span>
-                主营：
-                <span className="text-foreground">
-                  {profile.mainProducts.join("、") || "未填写"}
-                </span>
-              </span>
-              <span>
-                目标市场：
-                <span className="text-foreground">
-                  {profile.targetCountries.join("、") || "未填写"}
-                </span>
-              </span>
-            </div>
-            <Progress value={completeness} className="mt-2 h-1.5" />
-          </div>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <Button variant="outline" onClick={onGoProfile} className="gap-1.5">
-            <Wand2 className="h-4 w-4" />
-            完善画像
-          </Button>
-        </div>
-      </Card>
+      <ProfileHealthCard
+        profile={profile}
+        completeness={completeness}
+        onPatch={handleProfilePatch}
+        onOpenFull={onGoProfile}
+      />
 
       {/* 演示提示 + 偏好控制 */}
       <Card className="px-4 py-3 flex flex-wrap items-center gap-3 bg-amber-50/60 border-amber-200/70 text-amber-900">
@@ -387,11 +728,20 @@ function AiTab({ onGoProfile }: { onGoProfile: () => void }) {
                 {" "}今日剩余免费推荐 {quotaLeft}/{AI_DAILY_FREE} 次
               </span>
             </div>
+            {profileDirty && (
+              <div className="mt-2 inline-flex items-center gap-2 text-xs text-primary bg-primary/8 px-2.5 py-1 rounded-md">
+                <Sparkles className="h-3 w-3" />
+                画像已更新，建议重新生成推荐以获得更精准的匹配
+              </div>
+            )}
           </div>
           <Button
             size="lg"
             disabled={loading}
-            onClick={handleGenerate}
+            onClick={() => {
+              setProfileDirty(false);
+              handleGenerate();
+            }}
             className="gap-2 h-11 px-6 shrink-0 bg-gradient-to-r from-primary to-accent hover:opacity-90"
           >
             {loading ? (
