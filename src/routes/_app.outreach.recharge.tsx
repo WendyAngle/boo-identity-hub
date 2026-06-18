@@ -110,6 +110,11 @@ function RechargePage() {
   const [lastOrder, setLastOrder] = useState<{ no: string; credits: number; price: number } | null>(
     null,
   );
+  const ledger = useLedger();
+  const recentRecharges = useMemo(
+    () => ledger.filter((e) => e.kind === "recharge").slice(0, 5),
+    [ledger],
+  );
 
   const isCustom = selectedId === CUSTOM_ID;
   const pkg = useMemo<RechargePackage | null>(
