@@ -716,6 +716,19 @@ function FieldCell({ entry }: { entry: LedgerEntry }) {
 }
 
 function TargetCell({ entry: e }: { entry: LedgerEntry }) {
+  if (e.kind === "recharge") {
+    return (
+      <div className="flex items-center gap-2.5 min-w-0">
+        <div className="h-8 w-8 rounded-md bg-primary/10 text-primary flex items-center justify-center shrink-0">
+          <Wallet className="h-4 w-4" />
+        </div>
+        <div className="min-w-0">
+          <div className="font-medium truncate text-sm">{e.targetName}</div>
+          <div className="text-xs text-muted-foreground tabular-nums">{e.orderNo ?? "—"}</div>
+        </div>
+      </div>
+    );
+  }
   if (e.targetKind === "enterprise") {
     return (
       <Link
