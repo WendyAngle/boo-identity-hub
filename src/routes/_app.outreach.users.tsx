@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import {
   UserCog,
   Users,
@@ -71,8 +71,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_app/auth/user/users")({
-  head: () => ({ meta: [{ title: "用户管理 · 用户端 | Boo数据平台" }] }),
+export const Route = createFileRoute("/_app/outreach/users")({
+  head: () => ({ meta: [{ title: "触达客户管理 · 用户管理 | Boo数据平台" }] }),
   component: UserSideUsersPage,
 });
 
@@ -241,11 +241,7 @@ function UserSideUsersPage() {
     <div className="p-8 space-y-6">
       {/* Breadcrumb */}
       <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-        <span>实名认证</span>
-        <ChevronRight className="h-3.5 w-3.5" />
-        <Link to="/auth/user" className="hover:text-foreground">
-          用户端
-        </Link>
+        <span>触达客户管理</span>
         <ChevronRight className="h-3.5 w-3.5" />
         <span className="text-foreground font-medium">用户管理</span>
       </div>

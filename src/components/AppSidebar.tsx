@@ -8,19 +8,6 @@ type Root = { label: string; icon: typeof ShieldCheck; children: Group[] };
 
 const menu: Root[] = [
   {
-    label: "实名认证",
-    icon: ShieldCheck,
-    children: [
-      {
-        label: "用户端",
-        to: "/auth/user/users",
-        children: [
-          { label: "用户管理", to: "/auth/user/users", icon: UserCog },
-        ],
-      },
-    ],
-  },
-  {
     label: "积分管理系统",
     icon: Coins,
     children: [
@@ -89,6 +76,11 @@ const menu: Root[] = [
         to: "/outreach/billing",
         children: [],
       },
+      {
+        label: "用户管理",
+        to: "/outreach/users",
+        children: [],
+      },
     ],
   },
 ];
@@ -96,8 +88,7 @@ const menu: Root[] = [
 export function AppSidebar() {
   const { location } = useRouterState();
   const [open, setOpen] = useState<Record<string, boolean>>({
-    实名认证: true,
-    用户端: true,
+    触达客户管理: true,
   });
 
   return (
