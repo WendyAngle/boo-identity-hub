@@ -1470,6 +1470,27 @@ const COUNTRY_OPTIONS = [
   "singapore",
   "france",
 ];
+/* 英文 → 中文 别名字典：用于 hover 提示，保持选项标准化为英文 */
+const INDUSTRY_CN: Record<string, string> = {
+  manufacturing: "制造业",
+  retail: "零售",
+  logistics: "物流",
+  "marketing and advertising": "营销与广告",
+  "information technology": "信息技术",
+  "financial services": "金融服务",
+  healthcare: "医疗健康",
+  "higher education": "高等教育",
+};
+const COUNTRY_CN: Record<string, string> = {
+  "united states": "美国",
+  china: "中国",
+  japan: "日本",
+  germany: "德国",
+  "united kingdom": "英国",
+  mexico: "墨西哥",
+  singapore: "新加坡",
+  france: "法国",
+};
 const SCALE_OPTIONS = ["1-50", "51-200", "201-1000", "1000+"];
 const REVENUE_OPTIONS = ["<500 万", "500 万 - 5000 万", "5000 万 - 5 亿", ">5 亿"];
 
