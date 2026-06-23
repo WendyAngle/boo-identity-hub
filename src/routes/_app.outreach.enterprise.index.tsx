@@ -10,6 +10,7 @@ import {
   Linkedin,
   Facebook,
   Twitter,
+  MessageCircle,
   RotateCcw,
   X as XIcon,
   Hash,
@@ -376,6 +377,7 @@ function OutreachEnterprisePage() {
                   <SocialBadge active={e.socials.linkedin} kind="linkedin" />
                   <SocialBadge active={e.socials.facebook} kind="facebook" />
                   <SocialBadge active={e.socials.twitter} kind="twitter" />
+                  <SocialBadge active={e.socials.whatsapp} kind="whatsapp" />
                   <span className="ml-1 font-mono tabular-nums truncate">
                     {formatDateTime(e.createdAt)}
                   </span>
@@ -401,16 +403,24 @@ function SocialBadge({
   kind,
 }: {
   active: boolean;
-  kind: "linkedin" | "facebook" | "twitter";
+  kind: "linkedin" | "facebook" | "twitter" | "whatsapp";
 }) {
   const Icon =
-    kind === "linkedin" ? Linkedin : kind === "facebook" ? Facebook : Twitter;
+    kind === "linkedin"
+      ? Linkedin
+      : kind === "facebook"
+        ? Facebook
+        : kind === "whatsapp"
+          ? MessageCircle
+          : Twitter;
   const color =
     kind === "linkedin"
       ? "bg-[#0a66c2] text-white"
       : kind === "facebook"
         ? "bg-[#1877f2] text-white"
-        : "bg-foreground text-background";
+        : kind === "whatsapp"
+          ? "bg-[#25d366] text-white"
+          : "bg-foreground text-background";
   return (
     <span
       className={`inline-flex items-center justify-center h-6 w-6 rounded ${
