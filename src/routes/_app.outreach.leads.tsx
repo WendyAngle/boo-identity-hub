@@ -1655,13 +1655,7 @@ function ProfileTab() {
                 placeholder="https://"
               />
             </Field>
-            <Field label="认证资质">
-              <ChipInput
-                placeholder="ISO 9001、CE…"
-                value={draft.certifications}
-                onChange={(v) => set("certifications", v)}
-              />
-            </Field>
+            <div />
           </Grid2>
           <Field label="品牌故事 / 简介">
             <CountedTextarea
@@ -1672,26 +1666,11 @@ function ProfileTab() {
               placeholder="一段简短的企业故事，将用于 AI 理解品牌定位"
             />
           </Field>
-          <Field label="出口资质">
-            <div className="space-y-2.5">
-              <ChipInput
-                placeholder="自营进出口权、AEO 认证…"
-                value={draft.exportQualifications}
-                onChange={(v) => set("exportQualifications", v)}
-              />
-              <QualificationUploader
-                files={draft.exportQualificationFiles}
-                onChange={(f) => set("exportQualificationFiles", f)}
-                onRecognize={(name) => {
-                  if (!draft.exportQualifications.includes(name)) {
-                    set("exportQualifications", [
-                      ...draft.exportQualifications,
-                      name,
-                    ]);
-                  }
-                }}
-              />
-            </div>
+          <Field label="企业资质">
+            <QualificationsEditor
+              items={draft.qualifications}
+              onChange={(v) => set("qualifications", v)}
+            />
           </Field>
         </Section>
 
