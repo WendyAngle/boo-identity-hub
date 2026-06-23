@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   Star,
   ChevronRight,
@@ -13,6 +13,10 @@ import {
   ArrowUpDown,
   Trash2,
   Send,
+  MailPlus,
+  MessageSquare,
+  MailWarning,
+  Mailbox as MailboxIcon,
   ExternalLink,
   MapPin,
   Mail,
@@ -50,6 +54,20 @@ import {
 } from "@/lib/favorites";
 import { MaskedField } from "@/components/MaskedField";
 import { ReachButton } from "@/components/ReachButton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  useUsableMailboxes,
+  getDefaultUsableMailbox,
+} from "@/lib/mailboxes";
 import { formatDateTime } from "@/lib/format-date";
 import { toast } from "sonner";
 
