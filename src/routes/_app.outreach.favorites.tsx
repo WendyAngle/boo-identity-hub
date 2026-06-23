@@ -630,6 +630,11 @@ function FavoritesPage() {
                 <div className="text-muted-foreground">
                   即将向已选 <span className="font-semibold text-foreground">{selected.size}</span> 条收藏对象发送邮件，无邮箱的对象将被跳过。
                 </div>
+                <div className="rounded-md border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-300">
+                  本次将消耗
+                  <span className="font-semibold mx-1">{batchEmailCost} 积分</span>
+                  （{COST_REACH} 积分/条 × 有效 {validEmailCount} 条）
+                </div>
                 <div className="rounded-md border border-primary/20 bg-primary/5 p-3 space-y-2">
                   <div className="flex items-center gap-1.5 text-xs font-medium text-primary">
                     <MailboxIcon className="h-3.5 w-3.5" />
@@ -668,18 +673,21 @@ function FavoritesPage() {
             <AlertDialogCancel>取消</AlertDialogCancel>
             <AlertDialogAction
               className="bg-primary"
-              disabled={!batchSenderId && usableMailboxes.length !== 1}
+              disabled={
+                (!batchSenderId && usableMailboxes.length !== 1) ||
+                validEmailCount === 0
+              }
               onClick={() => {
                 const sender =
                   usableMailboxes.find((m) => m.id === batchSenderId) ??
                   usableMailboxes[0];
                 setBatchEmailOpen(false);
-                toast.success(`已加入发送队列：${selected.size} 封邮件`, {
-                  description: `发件邮箱 ${sender?.email}，可在「触达」模块查看进度`,
+                toast.success(`已加入发送队列：${validEmailCount} 封邮件`, {
+                  description: `发件邮箱 ${sender?.email}，扣除 ${batchEmailCost} 积分，可在「触达」模块查看进度`,
                 });
               }}
             >
-              确认发送
+              确认发送（-{batchEmailCost}）
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -693,22 +701,32 @@ function FavoritesPage() {
               <MessageSquare className="h-5 w-5 text-primary" />
               批量发短信
             </AlertDialogTitle>
-            <AlertDialogDescription>
-              即将向已选 <span className="font-semibold text-foreground">{selected.size}</span> 条收藏对象的联系电话发送短信，无电话的对象将被跳过。
+            <AlertDialogDescription asChild>
+              <div className="space-y-2 text-sm">
+                <div className="text-muted-foreground">
+                  即将向已选 <span className="font-semibold text-foreground">{selected.size}</span> 条收藏对象的联系电话发送短信，无电话的对象将被跳过。
+                </div>
+                <div className="rounded-md border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-300">
+                  本次将消耗
+                  <span className="font-semibold mx-1">{batchSmsCost} 积分</span>
+                  （{COST_REACH} 积分/条 × 有效 {validSmsCount} 条）
+                </div>
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>取消</AlertDialogCancel>
             <AlertDialogAction
               className="bg-primary"
+              disabled={validSmsCount === 0}
               onClick={() => {
                 setBatchSmsOpen(false);
-                toast.success(`已加入发送队列：${selected.size} 条短信`, {
-                  description: "可在「触达」模块查看进度",
+                toast.success(`已加入发送队列：${validSmsCount} 条短信`, {
+                  description: `扣除 ${batchSmsCost} 积分，可在「触达」模块查看进度`,
                 });
               }}
             >
-              确认发送
+              确认发送（-{batchSmsCost}）
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
