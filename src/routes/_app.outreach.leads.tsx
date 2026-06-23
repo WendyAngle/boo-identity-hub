@@ -78,6 +78,7 @@ import {
   saveProfile,
   profileCompleteness,
   type LeadProfile,
+  type QualificationItem,
 } from "@/lib/lead-profile";
 import {
   generateAiLeads,
