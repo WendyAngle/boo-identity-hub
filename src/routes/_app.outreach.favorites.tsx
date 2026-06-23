@@ -58,6 +58,7 @@ import {
 } from "@/lib/favorites";
 import { MaskedField } from "@/components/MaskedField";
 import { ReachButton } from "@/components/ReachButton";
+import { FavoriteToggle } from "@/components/FavoriteToggle";
 import { findEnterprise } from "@/data/enterprises";
 import {
   AlertDialog,
