@@ -267,39 +267,7 @@ export function ReachButton({
                     <span className="font-mono text-foreground truncate max-w-[260px]">{detail}</span>
                   </div>
                 </div>
-                {isEmail && (
-                  <div className="rounded-md border border-primary/20 bg-primary/5 p-3 space-y-2">
-                    <div className="flex items-center gap-1.5 text-xs font-medium text-primary">
-                      <MailboxIcon className="h-3.5 w-3.5" />
-                      发件邮箱
-                    </div>
-                    {mailboxes.length === 1 ? (
-                      <div className="text-xs">
-                        <span className="font-mono">{mailboxes[0].email}</span>
-                        <span className="text-muted-foreground ml-2">
-                          · {mailboxes[0].displayName}
-                        </span>
-                      </div>
-                    ) : (
-                      <Select value={sender?.id ?? ""} onValueChange={setSenderId}>
-                        <SelectTrigger className="h-9 bg-background">
-                          <SelectValue placeholder="选择发件邮箱" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {mailboxes.map((m) => (
-                            <SelectItem key={m.id} value={m.id}>
-                              <span className="font-mono">{m.email}</span>
-                              <span className="text-muted-foreground ml-2 text-xs">
-                                · {m.displayName}
-                                {m.isDefault ? " · 默认" : ""}
-                              </span>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  </div>
-                )}
+                {/* email/phone 走 ComposeSendDialog，此分支仅用于 social */}
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -307,7 +275,6 @@ export function ReachButton({
             <AlertDialogCancel>取消</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirm}
-              disabled={isEmail && !sender}
               className="bg-primary"
             >
               {isEmail || isPhone ? `确认发送（-${COST_REACH}）` : `确认触达（-${COST_REACH}）`}
