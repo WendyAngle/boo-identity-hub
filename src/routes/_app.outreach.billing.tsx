@@ -420,9 +420,16 @@ function BillingPage() {
           </Tab>
           <Tab active={tab === "reach"} onClick={() => setTab("reach")}>
             <Send className="h-3.5 w-3.5 mr-1 inline" />
-            触达消耗{" "}
+            触达-发送{" "}
             <span className="ml-1 text-muted-foreground">
               {ledger.filter((e) => e.kind === "reach").length}
+            </span>
+          </Tab>
+          <Tab active={tab === "ai_generate"} onClick={() => setTab("ai_generate")}>
+            <Sparkles className="h-3.5 w-3.5 mr-1 inline" />
+            触达-AI生成{" "}
+            <span className="ml-1 text-muted-foreground">
+              {ledger.filter((e) => e.kind === "ai_generate").length}
             </span>
           </Tab>
           <Tab active={tab === "refund"} onClick={() => setTab("refund")}>
