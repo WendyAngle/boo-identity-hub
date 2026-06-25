@@ -471,7 +471,13 @@ function BillingPage() {
               <SelectItem value="reach">
                 <span className="inline-flex items-center gap-1.5">
                   <Send className="h-3.5 w-3.5 text-violet-600" />
-                  触达消耗
+                  触达-发送内容消耗
+                </span>
+              </SelectItem>
+              <SelectItem value="ai_generate">
+                <span className="inline-flex items-center gap-1.5">
+                  <Sparkles className="h-3.5 w-3.5 text-amber-600" />
+                  触达-AI生成内容消耗
                 </span>
               </SelectItem>
               <SelectItem value="refund">
