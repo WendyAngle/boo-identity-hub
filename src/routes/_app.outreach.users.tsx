@@ -387,7 +387,6 @@ function UserSideUsersPage() {
                     aria-label="全选当前页"
                   />
                 </TableHead>
-                <TableHead className="whitespace-nowrap">用户ID</TableHead>
                 <TableHead>昵称 / 姓名</TableHead>
                 <TableHead className="whitespace-nowrap">手机号码</TableHead>
                 <TableHead>邮箱</TableHead>
@@ -400,7 +399,7 @@ function UserSideUsersPage() {
             <TableBody>
               {pageData.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-12 text-muted-foreground">
+                   <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
                     暂无匹配的员工
                   </TableCell>
                 </TableRow>
@@ -414,7 +413,6 @@ function UserSideUsersPage() {
                         aria-label={`选择 ${u.name}`}
                       />
                     </TableCell>
-                    <TableCell className="font-mono text-xs">{u.id}</TableCell>
                     <TableCell className="font-medium">{u.name}</TableCell>
                     <TableCell className="font-mono text-xs tabular-nums">{u.phone}</TableCell>
                     <TableCell className="text-sm">
@@ -712,13 +710,6 @@ function UserFormDialog({ open, onOpenChange, editing, onSubmit }: UserFormProps
         </DialogHeader>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2">
-          {isEdit && (
-            <div className="space-y-1.5 md:col-span-2">
-              <Label>用户ID</Label>
-              <Input value={editing?.id ?? ""} disabled className="font-mono text-xs" />
-            </div>
-          )}
-
           <div className="space-y-1.5">
             <Label>
               昵称 / 姓名 <span className="text-destructive">*</span>
@@ -863,7 +854,6 @@ function UserDetailDialog({
             {user && (
               <>
                 员工：<span className="text-foreground font-medium">{user.name}</span>
-                <span className="ml-2 font-mono text-xs">{user.id}</span>
               </>
             )}
           </DialogDescription>
