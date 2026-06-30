@@ -11,7 +11,12 @@ import {
   ChevronRight,
   ArrowUpRight,
   ArrowDownRight,
+  Trophy,
+  Medal,
+  Award,
+  ArrowRight,
 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -74,15 +79,24 @@ const PRODUCT_RANKING = [
   { name: "AI翻译", category: "AI文案助手", consumed: 1_289_300, orders: 41280 },
   { name: "邮件群发", category: "AI智能获客", consumed: 986_120, orders: 5230 },
   { name: "AI数字人形象", category: "AI视频制作", consumed: 742_580, orders: 1820 },
+  { name: "AI智能选品", category: "AI智能获客", consumed: 612_400, orders: 4380 },
+  { name: "AI商品文案", category: "AI文案助手", consumed: 528_900, orders: 12640 },
+  { name: "短信群发", category: "AI智能获客", consumed: 437_800, orders: 8920 },
+  { name: "AI语音克隆", category: "AI视频制作", consumed: 318_200, orders: 1240 },
 ];
 
 const fmt = (n: number) => n.toLocaleString("zh-CN");
 
 function PointsHome() {
-  const maxConsumed = useMemo(
-    () => Math.max(...PRODUCT_RANKING.map((p) => p.consumed)),
-    [],
-  );
+  const { totalConsumed, maxConsumed, top3, rest } = useMemo(() => {
+    const sum = PRODUCT_RANKING.reduce((a, p) => a + p.consumed, 0);
+    return {
+      totalConsumed: sum,
+      maxConsumed: Math.max(...PRODUCT_RANKING.map((p) => p.consumed)),
+      top3: PRODUCT_RANKING.slice(0, 3),
+      rest: PRODUCT_RANKING.slice(3),
+    };
+  }, []);
 
   return (
     <div className="p-8 space-y-6">
@@ -247,95 +261,58 @@ function PointsHome() {
 
       {/* Basic products ranking */}
       <Card className="p-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
             <h2 className="font-semibold text-foreground">基础产品累计消耗积分排序</h2>
             <p className="text-xs text-muted-foreground mt-0.5">
-              按累计消耗积分由高到低排序
+              共 {PRODUCT_RANKING.length} 个产品 · 累计消耗{" "}
+              <span className="text-foreground font-semibold tabular-nums">
+                {fmt(totalConsumed)}
+              </span>{" "}
+              积分
             </p>
           </div>
-          <Badge variant="secondary" className="text-xs">
-            共 {PRODUCT_RANKING.length} 个产品
-          </Badge>
+          <Link
+            to="/points/products/basic"
+            className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+          >
+            查看全部产品 <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-2 mt-5">
-          <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={PRODUCT_RANKING} layout="vertical" margin={{ left: 12, right: 16 }}>
-                <defs>
-                  <linearGradient id="barFill" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="var(--primary)" stopOpacity={0.55} />
-                    <stop offset="100%" stopColor="var(--primary)" stopOpacity={1} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
-                <XAxis
-                  type="number"
-                  tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
-                  stroke="var(--border)"
-                  tickFormatter={(v) => `${(v / 10000).toFixed(0)}w`}
-                />
-                <YAxis
-                  type="category"
-                  dataKey="name"
-                  width={92}
-                  tick={{ fontSize: 12, fill: "var(--foreground)" }}
-                  stroke="var(--border)"
-                />
-                <Tooltip
-                  cursor={{ fill: "var(--accent)", opacity: 0.4 }}
-                  contentStyle={{
-                    background: "var(--card)",
-                    border: "1px solid var(--border)",
-                    borderRadius: 8,
-                    fontSize: 12,
-                  }}
-                  formatter={(v: number) => fmt(v)}
-                />
-                <Bar dataKey="consumed" fill="url(#barFill)" radius={[0, 6, 6, 0]} barSize={20} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div className="rounded-lg border overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/50 text-muted-foreground">
-                <tr>
-                  <th className="px-3 py-2 text-left font-medium w-10">#</th>
-                  <th className="px-3 py-2 text-left font-medium">产品</th>
-                  <th className="px-3 py-2 text-right font-medium">消耗积分</th>
-                  <th className="px-3 py-2 text-right font-medium">订单</th>
-                </tr>
-              </thead>
-              <tbody>
-                {PRODUCT_RANKING.map((p, i) => (
-                  <tr key={p.name} className="border-t hover:bg-muted/30">
-                    <td className="px-3 py-2.5 text-muted-foreground tabular-nums">
-                      {String(i + 1).padStart(2, "0")}
-                    </td>
-                    <td className="px-3 py-2.5">
-                      <div className="font-medium text-foreground">{p.name}</div>
-                      <div className="text-[11px] text-muted-foreground">{p.category}</div>
-                      <div className="mt-1 h-1 w-full rounded-full bg-muted overflow-hidden">
-                        <div
-                          className="h-full bg-primary/80 rounded-full"
-                          style={{ width: `${(p.consumed / maxConsumed) * 100}%` }}
-                        />
-                      </div>
-                    </td>
-                    <td className="px-3 py-2.5 text-right font-semibold tabular-nums">
-                      {fmt(p.consumed)}
-                    </td>
-                    <td className="px-3 py-2.5 text-right text-muted-foreground tabular-nums">
-                      {fmt(p.orders)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        {/* TOP3 podium */}
+        <div className="grid gap-3 md:grid-cols-3 mt-5">
+          {top3.map((p, i) => (
+            <PodiumCard
+              key={p.name}
+              rank={i + 1}
+              product={p}
+              share={(p.consumed / totalConsumed) * 100}
+            />
+          ))}
         </div>
+
+        {/* Remaining ranking — responsive 2-col grid (scales with N) */}
+        {rest.length > 0 && (
+          <>
+            <div className="mt-6 mb-3 flex items-center gap-3">
+              <div className="text-xs font-medium text-muted-foreground">
+                其他产品
+              </div>
+              <div className="flex-1 h-px bg-border" />
+            </div>
+            <div className="grid gap-2 md:grid-cols-2">
+              {rest.map((p, i) => (
+                <RankRow
+                  key={p.name}
+                  rank={i + 4}
+                  product={p}
+                  pct={(p.consumed / maxConsumed) * 100}
+                />
+              ))}
+            </div>
+          </>
+        )}
       </Card>
     </div>
   );
@@ -410,4 +387,114 @@ function MiniStat({ label, value, accent }: { label: string; value: number; acce
 
 function LegendDot({ className }: { className: string }) {
   return <span className={`inline-block h-2 w-2 rounded-full ${className}`} />;
+}
+
+type RankProduct = (typeof PRODUCT_RANKING)[number];
+
+const PODIUM_STYLE = [
+  {
+    icon: Trophy,
+    badge: "bg-gradient-to-br from-amber-400 to-amber-600 text-white",
+    ring: "border-amber-300/60 bg-gradient-to-br from-amber-50 to-transparent",
+    bar: "bg-gradient-to-r from-amber-400 to-amber-500",
+    label: "text-amber-700",
+  },
+  {
+    icon: Medal,
+    badge: "bg-gradient-to-br from-slate-300 to-slate-500 text-white",
+    ring: "border-slate-300/60 bg-gradient-to-br from-slate-50 to-transparent",
+    bar: "bg-gradient-to-r from-slate-300 to-slate-500",
+    label: "text-slate-700",
+  },
+  {
+    icon: Award,
+    badge: "bg-gradient-to-br from-orange-400 to-orange-600 text-white",
+    ring: "border-orange-300/60 bg-gradient-to-br from-orange-50 to-transparent",
+    bar: "bg-gradient-to-r from-orange-400 to-orange-500",
+    label: "text-orange-700",
+  },
+];
+
+function PodiumCard({
+  rank,
+  product,
+  share,
+}: {
+  rank: number;
+  product: RankProduct;
+  share: number;
+}) {
+  const s = PODIUM_STYLE[rank - 1];
+  const Icon = s.icon;
+  return (
+    <div className={`relative rounded-xl border p-4 ${s.ring}`}>
+      <div className="flex items-start justify-between">
+        <div className={`flex items-center gap-2 text-xs font-bold ${s.label}`}>
+          <span className={`h-7 w-7 rounded-lg flex items-center justify-center shadow-sm ${s.badge}`}>
+            <Icon className="h-3.5 w-3.5" />
+          </span>
+          TOP {rank}
+        </div>
+        <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+          {product.category}
+        </Badge>
+      </div>
+      <div className="mt-3 text-base font-semibold text-foreground truncate">
+        {product.name}
+      </div>
+      <div className="mt-2 flex items-baseline gap-1">
+        <span className="text-2xl font-bold text-foreground tabular-nums">
+          {fmt(product.consumed)}
+        </span>
+        <span className="text-xs text-muted-foreground">积分</span>
+      </div>
+      <div className="mt-3 h-1.5 w-full rounded-full bg-muted overflow-hidden">
+        <div className={`h-full ${s.bar}`} style={{ width: `${share}%` }} />
+      </div>
+      <div className="mt-2 flex items-center justify-between text-[11px] text-muted-foreground">
+        <span>占比 <span className="text-foreground font-medium">{share.toFixed(1)}%</span></span>
+        <span>订单 <span className="text-foreground font-medium tabular-nums">{fmt(product.orders)}</span></span>
+      </div>
+    </div>
+  );
+}
+
+function RankRow({
+  rank,
+  product,
+  pct,
+}: {
+  rank: number;
+  product: RankProduct;
+  pct: number;
+}) {
+  return (
+    <div className="group flex items-center gap-3 rounded-lg border bg-card px-3 py-2.5 hover:border-primary/40 hover:bg-accent/40 transition-colors">
+      <span className="h-7 w-7 shrink-0 rounded-md bg-muted text-muted-foreground text-xs font-semibold flex items-center justify-center tabular-nums">
+        {String(rank).padStart(2, "0")}
+      </span>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between gap-2">
+          <div className="min-w-0">
+            <div className="text-sm font-medium text-foreground truncate">{product.name}</div>
+            <div className="text-[11px] text-muted-foreground truncate">{product.category}</div>
+          </div>
+          <div className="text-right shrink-0">
+            <div className="text-sm font-semibold text-foreground tabular-nums">
+              {fmt(product.consumed)}
+            </div>
+            <div className="text-[11px] text-muted-foreground tabular-nums">
+              {fmt(product.orders)} 单
+            </div>
+          </div>
+        </div>
+        <div className="mt-1.5 h-1 w-full rounded-full bg-muted overflow-hidden">
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-primary/50 to-primary"
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+      </div>
+    </div>
+  );
 }
