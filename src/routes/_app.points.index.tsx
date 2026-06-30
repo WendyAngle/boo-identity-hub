@@ -388,3 +388,113 @@ function MiniStat({ label, value, accent }: { label: string; value: number; acce
 function LegendDot({ className }: { className: string }) {
   return <span className={`inline-block h-2 w-2 rounded-full ${className}`} />;
 }
+
+type RankProduct = (typeof PRODUCT_RANKING)[number];
+
+const PODIUM_STYLE = [
+  {
+    icon: Trophy,
+    badge: "bg-gradient-to-br from-amber-400 to-amber-600 text-white",
+    ring: "border-amber-300/60 bg-gradient-to-br from-amber-50 to-transparent",
+    bar: "bg-gradient-to-r from-amber-400 to-amber-500",
+    label: "text-amber-700",
+  },
+  {
+    icon: Medal,
+    badge: "bg-gradient-to-br from-slate-300 to-slate-500 text-white",
+    ring: "border-slate-300/60 bg-gradient-to-br from-slate-50 to-transparent",
+    bar: "bg-gradient-to-r from-slate-300 to-slate-500",
+    label: "text-slate-700",
+  },
+  {
+    icon: Award,
+    badge: "bg-gradient-to-br from-orange-400 to-orange-600 text-white",
+    ring: "border-orange-300/60 bg-gradient-to-br from-orange-50 to-transparent",
+    bar: "bg-gradient-to-r from-orange-400 to-orange-500",
+    label: "text-orange-700",
+  },
+];
+
+function PodiumCard({
+  rank,
+  product,
+  share,
+}: {
+  rank: number;
+  product: RankProduct;
+  share: number;
+}) {
+  const s = PODIUM_STYLE[rank - 1];
+  const Icon = s.icon;
+  return (
+    <div className={`relative rounded-xl border p-4 ${s.ring}`}>
+      <div className="flex items-start justify-between">
+        <div className={`flex items-center gap-2 text-xs font-bold ${s.label}`}>
+          <span className={`h-7 w-7 rounded-lg flex items-center justify-center shadow-sm ${s.badge}`}>
+            <Icon className="h-3.5 w-3.5" />
+          </span>
+          TOP {rank}
+        </div>
+        <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+          {product.category}
+        </Badge>
+      </div>
+      <div className="mt-3 text-base font-semibold text-foreground truncate">
+        {product.name}
+      </div>
+      <div className="mt-2 flex items-baseline gap-1">
+        <span className="text-2xl font-bold text-foreground tabular-nums">
+          {fmt(product.consumed)}
+        </span>
+        <span className="text-xs text-muted-foreground">积分</span>
+      </div>
+      <div className="mt-3 h-1.5 w-full rounded-full bg-muted overflow-hidden">
+        <div className={`h-full ${s.bar}`} style={{ width: `${share}%` }} />
+      </div>
+      <div className="mt-2 flex items-center justify-between text-[11px] text-muted-foreground">
+        <span>占比 <span className="text-foreground font-medium">{share.toFixed(1)}%</span></span>
+        <span>订单 <span className="text-foreground font-medium tabular-nums">{fmt(product.orders)}</span></span>
+      </div>
+    </div>
+  );
+}
+
+function RankRow({
+  rank,
+  product,
+  pct,
+}: {
+  rank: number;
+  product: RankProduct;
+  pct: number;
+}) {
+  return (
+    <div className="group flex items-center gap-3 rounded-lg border bg-card px-3 py-2.5 hover:border-primary/40 hover:bg-accent/40 transition-colors">
+      <span className="h-7 w-7 shrink-0 rounded-md bg-muted text-muted-foreground text-xs font-semibold flex items-center justify-center tabular-nums">
+        {String(rank).padStart(2, "0")}
+      </span>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between gap-2">
+          <div className="min-w-0">
+            <div className="text-sm font-medium text-foreground truncate">{product.name}</div>
+            <div className="text-[11px] text-muted-foreground truncate">{product.category}</div>
+          </div>
+          <div className="text-right shrink-0">
+            <div className="text-sm font-semibold text-foreground tabular-nums">
+              {fmt(product.consumed)}
+            </div>
+            <div className="text-[11px] text-muted-foreground tabular-nums">
+              {fmt(product.orders)} 单
+            </div>
+          </div>
+        </div>
+        <div className="mt-1.5 h-1 w-full rounded-full bg-muted overflow-hidden">
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-primary/50 to-primary"
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
