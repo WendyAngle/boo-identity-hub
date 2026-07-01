@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Search, RotateCw, Plus, RefreshCw, AlertTriangle } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { Search, RotateCw, RefreshCw, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -219,17 +219,10 @@ function RechargesPage() {
       </Card>
 
       <Card className="p-4">
-        <div className="flex items-center justify-between mb-3">
-          <Button asChild variant="outline" className="h-9 gap-1.5 border-primary/30 text-primary hover:bg-primary/5 hover:text-primary">
-            <Link to="/outreach/recharge" search={{ from: "home" }}>
-              <Plus className="h-4 w-4" />新增充值
-            </Link>
+        <div className="flex items-center justify-end mb-3">
+          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => setApplied({ ...applied })}>
+            <RefreshCw className="h-4 w-4 text-muted-foreground" />
           </Button>
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => setApplied({ ...applied })}>
-              <RefreshCw className="h-4 w-4 text-muted-foreground" />
-            </Button>
-          </div>
         </div>
 
         <div className="rounded-lg border overflow-hidden">
