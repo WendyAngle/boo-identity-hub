@@ -520,15 +520,15 @@ function BillingPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">全部操作</SelectItem>
-              <SelectItem value="view_email">信息查看 · 邮箱</SelectItem>
-              <SelectItem value="view_phone">信息查看 · 电话</SelectItem>
-              <SelectItem value="view_social">信息查看 · 社媒</SelectItem>
-              <SelectItem value="view_address">信息查看 · 地址</SelectItem>
-              <SelectItem value="view_title">信息查看 · 职位</SelectItem>
-              <SelectItem value="view_seniority">信息查看 · 职级</SelectItem>
-              <SelectItem value="reach_email">触达 · 邮件</SelectItem>
-              <SelectItem value="reach_phone">触达 · 电话</SelectItem>
-              <SelectItem value="reach_social">触达 · 社媒</SelectItem>
+              <SelectItem value="view_email">查看邮箱</SelectItem>
+              <SelectItem value="view_phone">查看电话</SelectItem>
+              <SelectItem value="view_social">查看社媒</SelectItem>
+              <SelectItem value="view_address">查看地址</SelectItem>
+              <SelectItem value="view_title">查看职位</SelectItem>
+              <SelectItem value="view_seniority">查看职级</SelectItem>
+              <SelectItem value="reach_email">发送邮件</SelectItem>
+              <SelectItem value="reach_phone">发送短信</SelectItem>
+              <SelectItem value="reach_social">发送社媒消息</SelectItem>
               <SelectItem value="ai_generate">AI生成内容</SelectItem>
               <SelectItem value="pay_alipay">充值 · 支付宝</SelectItem>
               <SelectItem value="pay_wechat">充值 · 微信</SelectItem>
