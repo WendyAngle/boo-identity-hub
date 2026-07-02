@@ -453,7 +453,7 @@ function BillingPage() {
           <DateField label="开始日期" value={dateFrom} onChange={setDateFrom} />
           <DateField label="结束日期" value={dateTo} onChange={setDateTo} min={dateFrom} />
           <Select value={tab} onValueChange={(v) => setTab(v as TabKey)}>
-            <SelectTrigger className="h-9 w-[148px] bg-background">
+            <SelectTrigger className="h-9 w-[180px] bg-background">
               <SelectValue placeholder="变动类型" />
             </SelectTrigger>
             <SelectContent>
