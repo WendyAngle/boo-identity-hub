@@ -90,6 +90,21 @@ const NAMES = [
   "Atlas Engineering",
   "Lighthouse Ventures",
 ];
+const ALIAS_SUFFIXES = [
+  "国际",
+  "集团",
+  "(中国)",
+  "海外事业部",
+  "贸易",
+  "控股",
+  "科技",
+  "供应链",
+];
+function makeAlias(baseName: string, i: number): string {
+  const short = baseName.split(" ")[0];
+  const suffix = ALIAS_SUFFIXES[i % ALIAS_SUFFIXES.length];
+  return `${short}${suffix}`;
+}
 const CONTACT_NAMES = [
   "olga bookas",
   "michael chen",
