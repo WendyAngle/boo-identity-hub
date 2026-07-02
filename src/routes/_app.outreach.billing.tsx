@@ -172,8 +172,29 @@ function BillingPage() {
       recharge: rechargeSum,
       rechargeCount,
       count: all.length,
+      consumed: viewSum + reachSum + aiSum - refundSum,
+      granted: rechargeSum,
+      expired: 0,
     };
   }, [ledger]);
+
+  // 计算每条流水的「变动后余额」。以当前可用余额为最新一条记录的期末余额，向历史反推。
+  const balanceMap = useMemo(() => {
+    const map = new Map<string, number>();
+    // 按时间升序（最早在前）以便顺推
+    const sorted = [...ledger].sort(
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+    );
+    const signed = (e: LedgerEntry) =>
+      e.kind === "refund" || e.kind === "recharge" ? e.cost : -e.cost;
+    const totalDelta = sorted.reduce((s, e) => s + signed(e), 0);
+    let running = balance.balance - totalDelta; // 期初余额
+    for (const e of sorted) {
+      running += signed(e);
+      map.set(e.id, running);
+    }
+    return map;
+  }, [ledger, balance.balance]);
 
   const filteredConsume = filtered
     .filter((e) => e.kind === "view" || e.kind === "reach" || e.kind === "ai_generate")
