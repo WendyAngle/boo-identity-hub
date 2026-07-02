@@ -141,9 +141,8 @@ function BillingPage() {
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
   type OpKey =
     | "all"
-    | "view_email" | "view_phone" | "view_social" | "view_address" | "view_title" | "view_seniority"
+    | "view_email" | "view_phone" | "view_social"
     | "reach_email" | "reach_phone" | "reach_social"
-    | "ai_generate"
     | "pay_alipay" | "pay_wechat" | "pay_corp";
   const [op, setOp] = useState<OpKey>("all");
   const [rulesOpen, setRulesOpen] = useState(false);
@@ -523,13 +522,9 @@ function BillingPage() {
               <SelectItem value="view_email">查看邮箱</SelectItem>
               <SelectItem value="view_phone">查看电话</SelectItem>
               <SelectItem value="view_social">查看社媒账号</SelectItem>
-              <SelectItem value="view_address">查看地址</SelectItem>
-              <SelectItem value="view_title">查看职位</SelectItem>
-              <SelectItem value="view_seniority">查看职级</SelectItem>
               <SelectItem value="reach_email">发送邮件</SelectItem>
               <SelectItem value="reach_phone">发送短信</SelectItem>
               <SelectItem value="reach_social">触达社媒账号</SelectItem>
-              <SelectItem value="ai_generate">AI生成内容</SelectItem>
               <SelectItem value="pay_alipay">充值 · 支付宝</SelectItem>
               <SelectItem value="pay_wechat">充值 · 微信</SelectItem>
               <SelectItem value="pay_corp">充值 · 对公转账</SelectItem>
