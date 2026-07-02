@@ -218,7 +218,7 @@ export const ENTERPRISES: Enterprise[] = Array.from({ length: 60 }).map((_, i) =
     province,
     city,
     address: `${city}, ${province}, ${cp.name}`,
-    est: missingEst ? "-" : String(1831 + ((i * 17) % 190)),
+    est: missingEst ? "" : String(1831 + ((i * 17) % 190)),
     employees: ["1-10", "11-50", "51-200", "201-500", "501-1000", "1001-5000", "5000+"][i % 7],
     website: `www.${s}.com`,
     email: `contact@${s}.com`,
