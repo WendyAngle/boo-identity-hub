@@ -1062,6 +1062,49 @@ function renderCardInner(item: FootprintItem) {
     );
   }
 
+  if (item.module === "contact") {
+    return (
+      <Card className="p-4 h-full hover:shadow-md hover:border-primary/40 transition-all">
+        <div className="flex items-start gap-3">
+          <div className="h-10 w-10 rounded-lg bg-violet-500/10 text-violet-600 flex items-center justify-center shrink-0">
+            <UserRound className="h-5 w-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <Badge
+                variant="outline"
+                className="text-[10px] px-1.5 py-0 h-4 text-violet-600 border-violet-300"
+              >
+                人物
+              </Badge>
+              <span className="ml-auto text-[11px] text-muted-foreground flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                {formatTime(item.viewedAt)}
+              </span>
+            </div>
+            <div className="font-medium text-sm truncate capitalize group-hover:text-primary">
+              {item.contactName}
+            </div>
+            <div className="text-xs text-muted-foreground mt-1 truncate flex items-center gap-1">
+              <Briefcase className="h-3 w-3" />
+              <span className="truncate">{item.contactTitle}</span>
+            </div>
+            <div className="text-xs text-muted-foreground mt-1 truncate flex items-center gap-1">
+              <Building2 className="h-3 w-3" />
+              <span className="truncate">{item.enterpriseName}</span>
+            </div>
+            {item.contactEmail && (
+              <div className="text-[11px] text-muted-foreground mt-1 truncate flex items-center gap-1 font-mono">
+                <Mail className="h-3 w-3" />
+                {item.contactEmail}
+              </div>
+            )}
+          </div>
+        </div>
+      </Card>
+    );
+  }
+
   if (item.module === "product") {
     return (
       <Card className="p-4 h-full hover:shadow-md hover:border-primary/40 transition-all">
