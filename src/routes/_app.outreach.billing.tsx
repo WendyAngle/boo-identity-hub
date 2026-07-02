@@ -773,10 +773,12 @@ function StatCard({
             className={cn(
               "text-2xl font-bold tabular-nums",
               positive && value > 0 && "text-emerald-600",
+              signed && value > 0 && "text-emerald-600",
+              signed && value < 0 && "text-rose-600",
             )}
           >
-            {positive && value > 0 ? "+" : ""}
-            {value.toLocaleString()}
+            {signed ? (value > 0 ? "+" : value < 0 ? "−" : "") : positive && value > 0 ? "+" : ""}
+            {Math.abs(value).toLocaleString()}
           </span>
           <span className="text-xs text-muted-foreground">{unit}</span>
         </div>
