@@ -175,7 +175,7 @@ function buildTenant(id: string): CustomerDetail | null {
 /* ---------------- Page ---------------- */
 
 function CustomerDetailPage() {
-  const t = Route.useLoaderData();
+  const t = Route.useLoaderData() as CustomerDetail;
   const nf = useMemo(() => new Intl.NumberFormat("en-US"), []);
 
   return (
