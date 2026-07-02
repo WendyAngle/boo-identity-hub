@@ -621,7 +621,7 @@ function BillingPage() {
               <TableRow className="bg-primary/5 hover:bg-primary/5">
                 <TableHead className="w-[170px]">时间</TableHead>
                 <TableHead className="w-[140px]">变动类型</TableHead>
-                <TableHead className="w-[160px]">消费积分类型</TableHead>
+                <TableHead className="w-[160px]">操作</TableHead>
                 <TableHead>明细说明</TableHead>
                 <TableHead className="w-[110px] text-right">
                   <span className="inline-flex items-center gap-1">
