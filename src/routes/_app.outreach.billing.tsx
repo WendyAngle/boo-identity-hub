@@ -234,15 +234,11 @@ function BillingPage() {
       ["时间", "类型", "对象类型", "对象", "所属企业", "字段/渠道", "平台", "明细", "消耗"],
       ...filtered.map((e) => [
         fmtTime(e.createdAt),
-        e.kind === "view"
-          ? "信息查看"
-          : e.kind === "reach"
-            ? "触达-发送内容消耗"
-            : e.kind === "ai_generate"
-              ? "触达-AI生成内容消耗"
-              : e.kind === "refund"
-                ? "失败退还"
-                : "充值",
+        e.kind === "refund"
+          ? "服务失败退款"
+          : e.kind === "recharge"
+            ? "充值"
+            : "消费积分",
         e.targetKind === "enterprise" ? "企业" : "人物",
         e.targetName,
         e.parentRef?.name ?? "",
