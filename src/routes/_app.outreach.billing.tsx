@@ -826,6 +826,61 @@ function Tab({
   );
 }
 
+function DateField({
+  label,
+  value,
+  onChange,
+  min,
+}: {
+  label: string;
+  value: Date | undefined;
+  onChange: (d: Date | undefined) => void;
+  min?: Date;
+}) {
+  const fmt = (d: Date) =>
+    `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}`;
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          size="sm"
+          className={cn(
+            "h-9 justify-start gap-2 bg-background font-normal min-w-[170px]",
+            !value && "text-muted-foreground",
+          )}
+        >
+          <CalendarIcon className="h-3.5 w-3.5 opacity-70" />
+          <span className="text-xs text-muted-foreground">{label}</span>
+          <span className="ml-auto tabular-nums text-foreground">
+            {value ? fmt(value) : "年/月/日"}
+          </span>
+          {value && (
+            <X
+              className="h-3.5 w-3.5 opacity-60 hover:opacity-100"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onChange(undefined);
+              }}
+            />
+          )}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="start">
+        <Calendar
+          mode="single"
+          selected={value}
+          onSelect={onChange}
+          disabled={min ? (d) => d < new Date(new Date(min).setHours(0, 0, 0, 0)) : undefined}
+          initialFocus
+          className={cn("p-3 pointer-events-auto")}
+        />
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 function KindBadge({ entry }: { entry: LedgerEntry }) {
   if (entry.kind === "refund") {
     return (
