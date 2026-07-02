@@ -131,7 +131,7 @@ function EnterpriseDetailPage() {
           <Field label="成立年份">
             <span className="inline-flex items-center gap-1">
               <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-              {e.est}
+              {e.est || <Muted>未提供</Muted>}
             </span>
           </Field>
         </div>
