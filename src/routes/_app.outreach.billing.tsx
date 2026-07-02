@@ -139,12 +139,6 @@ function BillingPage() {
   const [kw, setKw] = useState("");
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
-  type OpKey =
-    | "all"
-    | "view_email" | "view_phone" | "view_social"
-    | "reach_email" | "reach_phone" | "reach_social"
-    | "pay_alipay" | "pay_wechat" | "pay_corp";
-  const [op, setOp] = useState<OpKey>("all");
   const [rulesOpen, setRulesOpen] = useState(false);
   const [page, setPage] = useState(1);
   const pageSize = 10;
@@ -168,16 +162,6 @@ function BillingPage() {
         else if (tab === "expire" || tab === "package_recharge" || tab === "recharge_refund")
           return false;
       }
-      if (op !== "all") {
-        if (op.startsWith("view_")) {
-          if (e.kind !== "view" || e.field !== op.slice(5)) return false;
-        } else if (op.startsWith("reach_")) {
-          if (e.kind !== "reach" || e.channel !== op.slice(6)) return false;
-        } else if (op.startsWith("pay_")) {
-          const pm = op.slice(4);
-          if (e.kind !== "recharge" || e.paymentMethod !== pm) return false;
-        }
-      }
       if (fromMs !== undefined) {
         const t = new Date(e.createdAt).getTime();
         if (t < fromMs) return false;
@@ -191,11 +175,11 @@ function BillingPage() {
         (e.platform ?? "").toLowerCase().includes(k)
       );
     });
-  }, [ledger, tab, op, dateFrom, dateTo, kw]);
+  }, [ledger, tab, dateFrom, dateTo, kw]);
 
   useEffect(() => {
     setPage(1);
-  }, [tab, kw, op, dateFrom, dateTo]);
+  }, [tab, kw, dateFrom, dateTo]);
 
   const pageData = useMemo(
     () => filtered.slice((page - 1) * pageSize, page * pageSize),
@@ -517,24 +501,7 @@ function BillingPage() {
               </SelectItem>
             </SelectContent>
           </Select>
-          <Select value={op} onValueChange={(v) => setOp(v as OpKey)}>
-            <SelectTrigger className="h-9 w-[160px] bg-background">
-              <SelectValue placeholder="操作" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">全部操作</SelectItem>
-              <SelectItem value="view_email">查看邮箱</SelectItem>
-              <SelectItem value="view_phone">查看电话</SelectItem>
-              <SelectItem value="view_social">查看社媒账号</SelectItem>
-              <SelectItem value="reach_email">发送邮件</SelectItem>
-              <SelectItem value="reach_phone">发送短信</SelectItem>
-              <SelectItem value="reach_social">触达社媒账号</SelectItem>
-              <SelectItem value="pay_alipay">充值 · 支付宝</SelectItem>
-              <SelectItem value="pay_wechat">充值 · 微信</SelectItem>
-              <SelectItem value="pay_corp">充值 · 对公转账</SelectItem>
-            </SelectContent>
-          </Select>
-          {(dateFrom || dateTo || tab !== "all" || op !== "all") && (
+          {(dateFrom || dateTo || tab !== "all") && (
             <Button
               variant="ghost"
               size="sm"
@@ -542,7 +509,6 @@ function BillingPage() {
                 setDateFrom(undefined);
                 setDateTo(undefined);
                 setTab("all");
-                setOp("all");
               }}
               className="gap-1"
             >
