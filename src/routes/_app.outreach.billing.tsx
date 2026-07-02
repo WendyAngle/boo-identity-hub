@@ -788,19 +788,11 @@ function Tab({
 }
 
 function KindBadge({ entry }: { entry: LedgerEntry }) {
-  if (entry.kind === "view") {
-    return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md border text-xs font-medium bg-sky-50 text-sky-700 border-sky-200">
-        <Eye className="h-3 w-3" />
-        信息查看
-      </span>
-    );
-  }
   if (entry.kind === "refund") {
     return (
       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md border text-xs font-medium bg-emerald-50 text-emerald-700 border-emerald-200">
         <Undo2 className="h-3 w-3" />
-        失败退还
+        服务失败退款
       </span>
     );
   }
@@ -812,18 +804,11 @@ function KindBadge({ entry }: { entry: LedgerEntry }) {
       </span>
     );
   }
-  if (entry.kind === "ai_generate") {
-    return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md border text-xs font-medium bg-amber-50 text-amber-700 border-amber-200">
-        <Sparkles className="h-3 w-3" />
-        触达-AI生成
-      </span>
-    );
-  }
+  // view / reach / ai_generate → 消费积分
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md border text-xs font-medium bg-violet-50 text-violet-700 border-violet-200">
-      <Send className="h-3 w-3" />
-      触达-发送
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md border text-xs font-medium bg-rose-50 text-rose-700 border-rose-200">
+      <TrendingDown className="h-3 w-3" />
+      消费积分
     </span>
   );
 }
