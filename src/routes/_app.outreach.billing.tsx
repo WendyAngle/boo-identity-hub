@@ -579,30 +579,6 @@ function BillingPage() {
             <span>
               共 <span className="text-foreground font-semibold">{filtered.length}</span> 条
             </span>
-            {filteredConsume > 0 && (
-              <span>
-                消耗{" "}
-                <span className="font-semibold text-rose-600 tabular-nums">
-                  -{filteredConsume}
-                </span>
-              </span>
-            )}
-            {filteredRefund > 0 && (
-              <span>
-                退还{" "}
-                <span className="font-semibold text-emerald-600 tabular-nums">
-                  +{filteredRefund}
-                </span>
-              </span>
-            )}
-            {filteredRecharge > 0 && (
-              <span>
-                充值{" "}
-                <span className="font-semibold text-emerald-600 tabular-nums">
-                  +{filteredRecharge}
-                </span>
-              </span>
-            )}
           </div>
         </div>
 
