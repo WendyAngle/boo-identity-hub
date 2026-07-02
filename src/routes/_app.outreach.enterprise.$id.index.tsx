@@ -28,6 +28,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { findEnterprise } from "@/data/enterprises";
+import { recordFootprint } from "@/lib/footprints-store";
 import type { Enterprise } from "@/data/enterprises";
 import heroBg from "@/assets/enterprise-hero.jpg";
 import { FavoriteToggle } from "@/components/FavoriteToggle";
