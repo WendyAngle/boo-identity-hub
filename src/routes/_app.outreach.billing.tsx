@@ -254,8 +254,52 @@ function BillingPage() {
     .reduce((s, e) => s + e.cost, 0);
 
   function handleExport(format: "csv" | "excel") {
+    const VIEW_ACTION: Record<string, string> = {
+      email: "查看邮箱",
+      phone: "查看电话",
+      social: "查看社媒账号",
+      address: "查看地址",
+      title: "查看职位",
+      seniority: "查看职级",
+    };
+    const REACH_ACTION: Record<string, string> = {
+      email: "发送邮件",
+      phone: "发送短信",
+      social: "触达社媒账号",
+    };
+    const PAY_LABEL: Record<string, string> = {
+      alipay: "支付宝",
+      wechat: "微信支付",
+      corp: "对公转账",
+    };
+    const opLabel = (e: LedgerEntry) => {
+      if (e.kind === "view") {
+        const base = VIEW_ACTION[e.field!] ?? "";
+        return e.field === "social" && (e.platform || e.detail)
+          ? `${base} · ${e.platform ?? e.detail}`
+          : base;
+      }
+      if (e.kind === "reach" || e.kind === "refund")
+        return e.channel ? REACH_ACTION[e.channel] ?? "" : "";
+      if (e.kind === "recharge") return PAY_LABEL[e.paymentMethod ?? ""] ?? "";
+      return "";
+    };
+    const detailText = (e: LedgerEntry) => {
+      const prefix =
+        e.kind === "refund" ? "触达失败退还 · " : e.kind === "recharge" ? "套餐充值 · " : "";
+      const target =
+        e.kind === "recharge"
+          ? e.orderNo
+            ? `订单 ${e.orderNo}`
+            : ""
+          : e.targetKind === "enterprise"
+            ? e.targetName
+            : `${e.parentRef?.name ?? "—"} · ${e.targetName}`;
+      const detail = e.detail ?? "";
+      return [`${prefix}${detail}`, target].filter(Boolean).join(" | ");
+    };
     const rows = [
-      ["时间", "类型", "对象类型", "对象", "所属企业", "字段/渠道", "平台", "明细", "消耗"],
+      ["时间", "变动类型", "操作", "明细说明", "积分变动", "变动后余额"],
       ...filtered.map((e) => [
         fmtTime(e.createdAt),
         e.kind === "refund"
@@ -263,17 +307,10 @@ function BillingPage() {
           : e.kind === "recharge"
             ? "充值"
             : "消费积分",
-        e.targetKind === "enterprise" ? "企业" : "人物",
-        e.targetName,
-        e.parentRef?.name ?? "",
-        e.kind === "view"
-          ? VIEW_FIELD_LABEL[e.field!] ?? ""
-          : e.channel
-            ? REACH_CHANNEL_LABEL[e.channel]
-            : "",
-        e.platform ?? "",
-        e.detail ?? "",
+        opLabel(e),
+        detailText(e),
         `${e.kind === "refund" || e.kind === "recharge" ? "+" : "-"}${e.cost}`,
+        String(balanceMap.get(e.id) ?? ""),
       ]),
     ];
     const csv = rows
