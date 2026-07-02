@@ -69,6 +69,11 @@ import {
   type FavoriteKind,
   type FavoritePayload,
 } from "@/lib/favorites";
+import {
+  useRuntimeFootprints,
+  clearRuntimeFootprints,
+  type RuntimeFootprint,
+} from "@/lib/footprints-store";
 
 export const Route = createFileRoute("/_app/outreach/footprints")({
   head: () => ({ meta: [{ title: "出海大数据平台 · 足迹 | Boo数据平台" }] }),
@@ -237,6 +242,19 @@ function genFootprints(): FootprintItem[] {
 
 const ALL_FOOTPRINTS = genFootprints();
 
+function runtimeDedupeKey(f: FootprintItem | RuntimeFootprint): string {
+  switch (f.module) {
+    case "enterprise":
+      return `E:${f.enterpriseId}`;
+    case "contact":
+      return `C:${f.enterpriseId}:${f.contactIdx}`;
+    case "product":
+      return `P:${f.hs}`;
+    case "bill":
+      return `B:${f.billNo}`;
+  }
+}
+
 type ModuleFilter = "all" | FootprintModule;
 
 function formatDateKey(d: Date) {
@@ -267,9 +285,18 @@ function FootprintsPage() {
       }
   >(null);
 
+  const runtime = useRuntimeFootprints();
+  const merged = useMemo<FootprintItem[]>(() => {
+    // 运行时足迹在前（更新），mock 在后
+    const rt: FootprintItem[] = runtime.map((r) => ({ ...(r as FootprintItem) }));
+    const rtKeys = new Set(rt.map((r) => runtimeDedupeKey(r)));
+    const mock = ALL_FOOTPRINTS.filter((m) => !rtKeys.has(runtimeDedupeKey(m)));
+    return [...rt, ...mock];
+  }, [runtime]);
+
   const visible = useMemo(
-    () => ALL_FOOTPRINTS.filter((it) => !hiddenIds.has(it.id)),
-    [hiddenIds],
+    () => merged.filter((it) => !hiddenIds.has(it.id)),
+    [merged, hiddenIds],
   );
 
   const filtered = useMemo(() => {
@@ -389,6 +416,8 @@ function FootprintsPage() {
 
   function applyDelete(ids: string[]) {
     if (ids.length === 0) return;
+    const rtIds = ids.filter((i) => i.startsWith("rt-"));
+    if (rtIds.length) clearRuntimeFootprints(rtIds);
     setHiddenIds((prev) => {
       const n = new Set(prev);
       ids.forEach((i) => n.add(i));
