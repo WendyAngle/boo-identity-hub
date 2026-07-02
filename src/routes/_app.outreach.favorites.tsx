@@ -18,7 +18,6 @@ import {
   MailWarning,
   Mailbox as MailboxIcon,
   ExternalLink,
-  MapPin,
   Mail,
   Phone,
   Briefcase,
