@@ -501,24 +501,7 @@ function BillingPage() {
               </SelectItem>
             </SelectContent>
           </Select>
-          <Select value={op} onValueChange={(v) => setOp(v as OpKey)}>
-            <SelectTrigger className="h-9 w-[160px] bg-background">
-              <SelectValue placeholder="操作" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">全部操作</SelectItem>
-              <SelectItem value="view_email">查看邮箱</SelectItem>
-              <SelectItem value="view_phone">查看电话</SelectItem>
-              <SelectItem value="view_social">查看社媒账号</SelectItem>
-              <SelectItem value="reach_email">发送邮件</SelectItem>
-              <SelectItem value="reach_phone">发送短信</SelectItem>
-              <SelectItem value="reach_social">触达社媒账号</SelectItem>
-              <SelectItem value="pay_alipay">充值 · 支付宝</SelectItem>
-              <SelectItem value="pay_wechat">充值 · 微信</SelectItem>
-              <SelectItem value="pay_corp">充值 · 对公转账</SelectItem>
-            </SelectContent>
-          </Select>
-          {(dateFrom || dateTo || tab !== "all" || op !== "all") && (
+          {(dateFrom || dateTo || tab !== "all") && (
             <Button
               variant="ghost"
               size="sm"
@@ -526,7 +509,6 @@ function BillingPage() {
                 setDateFrom(undefined);
                 setDateTo(undefined);
                 setTab("all");
-                setOp("all");
               }}
               className="gap-1"
             >
