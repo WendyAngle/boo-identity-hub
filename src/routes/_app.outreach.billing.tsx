@@ -882,10 +882,18 @@ function FieldCell({ entry }: { entry: LedgerEntry }) {
       seniority: BadgeCheck,
     };
     const I = Icon[entry.field!];
+    const VIEW_ACTION_LABEL: Record<ViewField, string> = {
+      email: "查看邮箱",
+      phone: "查看电话",
+      social: "查看社媒",
+      address: "查看地址",
+      title: "查看职位",
+      seniority: "查看职级",
+    };
     return (
       <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
         <I className="h-3.5 w-3.5" />
-        <span className="text-foreground">{VIEW_FIELD_LABEL[entry.field!]}</span>
+        <span className="text-foreground">{VIEW_ACTION_LABEL[entry.field!]}</span>
       </span>
     );
   }
@@ -897,10 +905,15 @@ function FieldCell({ entry }: { entry: LedgerEntry }) {
     social: Globe,
   };
   const I = Icon[entry.channel];
+  const REACH_ACTION_LABEL: Record<ReachChannel, string> = {
+    email: "发送邮件",
+    phone: "发送短信",
+    social: "发送社媒消息",
+  };
   return (
     <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
       <I className="h-3.5 w-3.5" />
-      <span className="text-foreground">{REACH_CHANNEL_LABEL[entry.channel]}</span>
+      <span className="text-foreground">{REACH_ACTION_LABEL[entry.channel]}</span>
       {entry.platform && <span>· {entry.platform}</span>}
     </span>
   );
