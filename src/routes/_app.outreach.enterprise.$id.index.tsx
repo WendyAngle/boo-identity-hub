@@ -144,7 +144,7 @@ function EnterpriseDetailPage() {
           <p className="text-sm text-foreground/80 leading-relaxed">{e.desc}</p>
         </div>
         {/* 联系方式与创建时间 */}
-        <div className="mt-5 pt-5 border-t grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-5">
+        <div className="mt-5 pt-5 border-t grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
           <Field label="联系邮箱">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="inline-flex items-center gap-1.5">
@@ -188,9 +188,6 @@ function EnterpriseDetailPage() {
                 detail={e.phone}
               />
             </div>
-          </Field>
-          <Field label="创建时间">
-            <span className="font-mono tabular-nums">{formatDateTime(e.createdAt)}</span>
           </Field>
         </div>
       </Section>
