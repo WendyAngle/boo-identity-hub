@@ -437,30 +437,20 @@ function BillingPage() {
           <Tab active={tab === "all"} onClick={() => setTab("all")}>
             全部 <span className="ml-1 text-muted-foreground">{ledger.length}</span>
           </Tab>
-          <Tab active={tab === "view"} onClick={() => setTab("view")}>
-            <Eye className="h-3.5 w-3.5 mr-1 inline" />
-            信息查看{" "}
+          <Tab active={tab === "consume"} onClick={() => setTab("consume")}>
+            <TrendingDown className="h-3.5 w-3.5 mr-1 inline" />
+            消费积分{" "}
             <span className="ml-1 text-muted-foreground">
-              {ledger.filter((e) => e.kind === "view").length}
-            </span>
-          </Tab>
-          <Tab active={tab === "reach"} onClick={() => setTab("reach")}>
-            <Send className="h-3.5 w-3.5 mr-1 inline" />
-            触达-发送{" "}
-            <span className="ml-1 text-muted-foreground">
-              {ledger.filter((e) => e.kind === "reach").length}
-            </span>
-          </Tab>
-          <Tab active={tab === "ai_generate"} onClick={() => setTab("ai_generate")}>
-            <Sparkles className="h-3.5 w-3.5 mr-1 inline" />
-            触达-AI生成{" "}
-            <span className="ml-1 text-muted-foreground">
-              {ledger.filter((e) => e.kind === "ai_generate").length}
+              {
+                ledger.filter(
+                  (e) => e.kind === "view" || e.kind === "reach" || e.kind === "ai_generate",
+                ).length
+              }
             </span>
           </Tab>
           <Tab active={tab === "refund"} onClick={() => setTab("refund")}>
             <Undo2 className="h-3.5 w-3.5 mr-1 inline" />
-            失败退还{" "}
+            服务失败退款{" "}
             <span className="ml-1 text-muted-foreground">
               {ledger.filter((e) => e.kind === "refund").length}
             </span>
@@ -472,6 +462,18 @@ function BillingPage() {
               {ledger.filter((e) => e.kind === "recharge").length}
             </span>
           </Tab>
+          <Tab active={tab === "expire"} onClick={() => setTab("expire")}>
+            <AlertTriangle className="h-3.5 w-3.5 mr-1 inline" />
+            失效 <span className="ml-1 text-muted-foreground">0</span>
+          </Tab>
+          <Tab active={tab === "package_recharge"} onClick={() => setTab("package_recharge")}>
+            <Wallet className="h-3.5 w-3.5 mr-1 inline" />
+            套餐充值 <span className="ml-1 text-muted-foreground">0</span>
+          </Tab>
+          <Tab active={tab === "recharge_refund"} onClick={() => setTab("recharge_refund")}>
+            <Undo2 className="h-3.5 w-3.5 mr-1 inline" />
+            充值退款 <span className="ml-1 text-muted-foreground">0</span>
+          </Tab>
         </div>
         <div className="px-5 py-3 flex items-center gap-3 flex-wrap border-b border-border bg-muted/20">
           <DateRangePicker
@@ -482,40 +484,46 @@ function BillingPage() {
               if (c !== undefined) setCustomRange(c);
             }}
           />
-          <Select value={tab} onValueChange={(v) => setTab(v as "all" | LedgerKind)}>
+          <Select value={tab} onValueChange={(v) => setTab(v as TabKey)}>
             <SelectTrigger className="h-9 w-[148px] bg-background">
-              <SelectValue placeholder="类型" />
+              <SelectValue placeholder="变动类型" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">全部类型</SelectItem>
-              <SelectItem value="view">
+              <SelectItem value="all">全部变动</SelectItem>
+              <SelectItem value="consume">
                 <span className="inline-flex items-center gap-1.5">
-                  <Eye className="h-3.5 w-3.5 text-sky-600" />
-                  信息查看
-                </span>
-              </SelectItem>
-              <SelectItem value="reach">
-                <span className="inline-flex items-center gap-1.5">
-                  <Send className="h-3.5 w-3.5 text-violet-600" />
-                  触达-发送内容消耗
-                </span>
-              </SelectItem>
-              <SelectItem value="ai_generate">
-                <span className="inline-flex items-center gap-1.5">
-                  <Sparkles className="h-3.5 w-3.5 text-amber-600" />
-                  触达-AI生成内容消耗
+                  <TrendingDown className="h-3.5 w-3.5 text-rose-600" />
+                  消费积分
                 </span>
               </SelectItem>
               <SelectItem value="refund">
                 <span className="inline-flex items-center gap-1.5">
                   <Undo2 className="h-3.5 w-3.5 text-emerald-600" />
-                  失败退还
+                  服务失败退款
                 </span>
               </SelectItem>
               <SelectItem value="recharge">
                 <span className="inline-flex items-center gap-1.5">
                   <Wallet className="h-3.5 w-3.5 text-emerald-600" />
                   充值
+                </span>
+              </SelectItem>
+              <SelectItem value="expire">
+                <span className="inline-flex items-center gap-1.5">
+                  <AlertTriangle className="h-3.5 w-3.5 text-slate-500" />
+                  失效
+                </span>
+              </SelectItem>
+              <SelectItem value="package_recharge">
+                <span className="inline-flex items-center gap-1.5">
+                  <Wallet className="h-3.5 w-3.5 text-primary" />
+                  套餐充值
+                </span>
+              </SelectItem>
+              <SelectItem value="recharge_refund">
+                <span className="inline-flex items-center gap-1.5">
+                  <Undo2 className="h-3.5 w-3.5 text-amber-600" />
+                  充值退款
                 </span>
               </SelectItem>
             </SelectContent>
