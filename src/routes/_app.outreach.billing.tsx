@@ -723,6 +723,7 @@ function StatCard({
   unit,
   tone,
   positive,
+  signed,
   hint,
 }: {
   icon: React.ReactNode;
