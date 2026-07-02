@@ -172,8 +172,29 @@ function BillingPage() {
       recharge: rechargeSum,
       rechargeCount,
       count: all.length,
+      consumed: viewSum + reachSum + aiSum - refundSum,
+      granted: rechargeSum,
+      expired: 0,
     };
   }, [ledger]);
+
+  // 计算每条流水的「变动后余额」。以当前可用余额为最新一条记录的期末余额，向历史反推。
+  const balanceMap = useMemo(() => {
+    const map = new Map<string, number>();
+    // 按时间升序（最早在前）以便顺推
+    const sorted = [...ledger].sort(
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+    );
+    const signed = (e: LedgerEntry) =>
+      e.kind === "refund" || e.kind === "recharge" ? e.cost : -e.cost;
+    const totalDelta = sorted.reduce((s, e) => s + signed(e), 0);
+    let running = balance.balance - totalDelta; // 期初余额
+    for (const e of sorted) {
+      running += signed(e);
+      map.set(e.id, running);
+    }
+    return map;
+  }, [ledger, balance.balance]);
 
   const filteredConsume = filtered
     .filter((e) => e.kind === "view" || e.kind === "reach" || e.kind === "ai_generate")
@@ -353,57 +374,38 @@ function BillingPage() {
         </div>
       </section>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard
           icon={<Wallet className="h-5 w-5" />}
-          label="净消耗"
-          value={stats.total}
+          label="可用余额"
+          value={balance.balance}
           unit="积分"
           tone="primary"
-        />
-        <StatCard
-          icon={<Eye className="h-5 w-5" />}
-          label="信息查看"
-          value={stats.view}
-          unit="积分"
-          tone="sky"
-        />
-        <StatCard
-          icon={<Send className="h-5 w-5" />}
-          label="触达-发送内容消耗"
-          value={stats.reach}
-          unit="积分"
-          tone="violet"
-        />
-        <StatCard
-          icon={<Sparkles className="h-5 w-5" />}
-          label="触达-AI生成内容消耗"
-          value={stats.ai}
-          unit="积分"
-          tone="amber"
-        />
-        <StatCard
-          icon={<Undo2 className="h-5 w-5" />}
-          label="失败退还"
-          value={stats.refund}
-          unit="积分"
-          tone="emerald"
-          positive
-        />
-        <StatCard
-          icon={<Wallet className="h-5 w-5" />}
-          label="累计充值"
-          value={stats.recharge}
-          unit="积分"
-          tone="emerald"
-          positive
+          hint={`有效期至 ${formatExpiry(balance.expiresAt)}`}
         />
         <StatCard
           icon={<TrendingDown className="h-5 w-5" />}
-          label="账单条数"
-          value={stats.count}
-          unit="条"
+          label="已消费积分"
+          value={stats.consumed}
+          unit="积分"
+          tone="sky"
+          hint="信息查看 + 触达发送 + AI生成 - 失败退还"
+        />
+        <StatCard
+          icon={<Wallet className="h-5 w-5" />}
+          label="累计发放积分"
+          value={stats.granted}
+          unit="积分"
+          tone="emerald"
+          hint="历史累计充值/发放到账"
+        />
+        <StatCard
+          icon={<AlertTriangle className="h-5 w-5" />}
+          label="已失效积分"
+          value={stats.expired}
+          unit="积分"
           tone="slate"
+          hint="已过有效期未使用的积分"
         />
       </div>
 
@@ -587,10 +589,9 @@ function BillingPage() {
             <TableHeader>
               <TableRow className="bg-primary/5 hover:bg-primary/5">
                 <TableHead className="w-[170px]">时间</TableHead>
-                <TableHead className="w-[120px]">类型</TableHead>
-                <TableHead className="w-[280px]">对象</TableHead>
-                <TableHead className="w-[140px]">字段 / 渠道</TableHead>
-                <TableHead>明细</TableHead>
+                <TableHead className="w-[140px]">变动类型</TableHead>
+                <TableHead className="w-[160px]">消费积分类型</TableHead>
+                <TableHead>明细说明</TableHead>
                 <TableHead className="w-[110px] text-right">
                   <span className="inline-flex items-center gap-1">
                     积分变动
@@ -610,6 +611,7 @@ function BillingPage() {
                     </Tooltip>
                   </span>
                 </TableHead>
+                <TableHead className="w-[130px] text-right">变动后余额</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -622,15 +624,10 @@ function BillingPage() {
                     <KindBadge entry={e} />
                   </TableCell>
                   <TableCell>
-                    <TargetCell entry={e} />
-                  </TableCell>
-                  <TableCell>
                     <FieldCell entry={e} />
                   </TableCell>
-                  <TableCell className="font-mono text-xs text-muted-foreground truncate max-w-[320px]">
-                    {e.kind === "refund"
-                      ? `触达失败退还 · ${e.detail ?? "—"}`
-                      : (e.detail ?? "—")}
+                  <TableCell className="text-xs max-w-[380px]">
+                    <DetailCell entry={e} />
                   </TableCell>
                   <TableCell
                     className={cn(
@@ -641,7 +638,10 @@ function BillingPage() {
                     )}
                   >
                     {e.kind === "refund" || e.kind === "recharge" ? "+" : "-"}
-                    {e.cost}
+                    {e.cost.toLocaleString()}
+                  </TableCell>
+                  <TableCell className="text-right font-mono tabular-nums text-sm">
+                    {(balanceMap.get(e.id) ?? 0).toLocaleString()}
                   </TableCell>
                 </TableRow>
               ))}
@@ -672,6 +672,7 @@ function StatCard({
   unit,
   tone,
   positive,
+  hint,
 }: {
   icon: React.ReactNode;
   label: string;
@@ -679,6 +680,7 @@ function StatCard({
   unit: string;
   tone: "primary" | "sky" | "violet" | "slate" | "emerald" | "amber";
   positive?: boolean;
+  hint?: string;
 }) {
   const toneMap = {
     primary: "bg-primary/10 text-primary ring-primary/20",
@@ -694,7 +696,25 @@ function StatCard({
         {icon}
       </div>
       <div className="min-w-0">
-        <div className="text-xs text-muted-foreground">{label}</div>
+        <div className="text-xs text-muted-foreground flex items-center gap-1">
+          {label}
+          {hint && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  className="text-muted-foreground/70 hover:text-foreground"
+                  aria-label={`${label}说明`}
+                >
+                  <HelpCircle className="h-3 w-3" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-xs text-xs">
+                {hint}
+              </TooltipContent>
+            </Tooltip>
+          )}
+        </div>
         <div className="mt-1 flex items-baseline gap-1.5">
           <span
             className={cn(
@@ -703,7 +723,7 @@ function StatCard({
             )}
           >
             {positive && value > 0 ? "+" : ""}
-            {value}
+            {value.toLocaleString()}
           </span>
           <span className="text-xs text-muted-foreground">{unit}</span>
         </div>
@@ -823,6 +843,70 @@ function FieldCell({ entry }: { entry: LedgerEntry }) {
       <span className="text-foreground">{REACH_CHANNEL_LABEL[entry.channel]}</span>
       {entry.platform && <span>· {entry.platform}</span>}
     </span>
+  );
+}
+
+function DetailCell({ entry: e }: { entry: LedgerEntry }) {
+  const detail = e.detail ?? "—";
+  const prefix =
+    e.kind === "refund"
+      ? "触达失败退还 · "
+      : e.kind === "recharge"
+        ? "套餐充值 · "
+        : "";
+  const target =
+    e.kind === "recharge"
+      ? e.orderNo
+        ? `订单 ${e.orderNo}`
+        : ""
+      : e.targetKind === "enterprise"
+        ? e.targetName
+        : `${e.parentRef?.name ?? "—"} · ${e.targetName}`;
+  const link =
+    e.kind === "recharge"
+      ? null
+      : e.targetKind === "enterprise"
+        ? findEnterprise(e.targetId)
+          ? { to: "/outreach/enterprise/$id" as const, params: { id: e.targetId } }
+          : null
+        : (() => {
+            const [entId, idx] = e.targetId.split(":");
+            return findEnterprise(entId)
+              ? {
+                  to: "/outreach/enterprise/$id/contact/$idx" as const,
+                  params: { id: entId, idx },
+                }
+              : null;
+          })();
+  return (
+    <div className="min-w-0">
+      <div className="font-mono text-xs text-foreground truncate">
+        {prefix}
+        {detail}
+      </div>
+      {target && (
+        <div className="text-[11px] text-muted-foreground truncate mt-0.5 flex items-center gap-1">
+          {e.kind === "recharge" ? (
+            <Wallet className="h-3 w-3" />
+          ) : e.targetKind === "enterprise" ? (
+            <Building2 className="h-3 w-3" />
+          ) : (
+            <UserRound className="h-3 w-3" />
+          )}
+          {link ? (
+            <Link
+              to={link.to}
+              params={link.params as never}
+              className="capitalize hover:text-primary truncate"
+            >
+              {target}
+            </Link>
+          ) : (
+            <span className="capitalize truncate">{target}</span>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
 
