@@ -20,6 +20,9 @@ import {
   CheckCheck,
   TrendingUp,
   Trophy,
+  UserRound,
+  Mail,
+  Briefcase,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -72,7 +75,7 @@ export const Route = createFileRoute("/_app/outreach/footprints")({
   component: FootprintsPage,
 });
 
-type FootprintModule = "enterprise" | "product" | "bill";
+type FootprintModule = "enterprise" | "contact" | "product" | "bill";
 
 interface FootprintItem {
   id: string;
@@ -83,6 +86,11 @@ interface FootprintItem {
   enterpriseCountry?: string;
   enterpriseIndustry?: string;
   enterpriseRole?: string;
+  contactIdx?: number;
+  contactName?: string;
+  contactTitle?: string;
+  contactEmail?: string;
+  contactCity?: string;
   hs?: string;
   productName?: string;
   productEn?: string;
@@ -148,9 +156,15 @@ function genFootprints(): FootprintItem[] {
     const count = 2 + (seed % 4);
     for (let i = 0; i < count; i++) {
       const s = h(`${dateStr}-${i}`);
-      const moduleIdx = s % 3;
+      const moduleIdx = s % 4;
       const moduleKey: FootprintModule =
-        moduleIdx === 0 ? "enterprise" : moduleIdx === 1 ? "product" : "bill";
+        moduleIdx === 0
+          ? "enterprise"
+          : moduleIdx === 1
+            ? "contact"
+            : moduleIdx === 2
+              ? "product"
+              : "bill";
       const hh = String(8 + ((s >> 3) % 12)).padStart(2, "0");
       const mm = String((s >> 5) % 60).padStart(2, "0");
       const ss = String((s >> 7) % 60).padStart(2, "0");
@@ -166,6 +180,26 @@ function genFootprints(): FootprintItem[] {
           enterpriseCountry: ent.country,
           enterpriseIndustry: ent.industry,
           enterpriseRole: ent.tradeRole,
+        });
+      } else if (moduleKey === "contact") {
+        const ent = ENTERPRISES[s % ENTERPRISES.length];
+        const cIdx = ent.contacts.length ? s % ent.contacts.length : 0;
+        const c = ent.contacts[cIdx];
+        if (!c) continue;
+        items.push({
+          id: `f-${dateStr}-${i}`,
+          module: moduleKey,
+          viewedAt,
+          enterpriseId: ent.id,
+          enterpriseName: ent.name,
+          enterpriseCountry: ent.country,
+          enterpriseIndustry: ent.industry,
+          enterpriseRole: ent.tradeRole,
+          contactIdx: cIdx,
+          contactName: c.name,
+          contactTitle: c.title,
+          contactEmail: c.email,
+          contactCity: ent.city,
         });
       } else if (moduleKey === "product") {
         const hs = HS_POOL[s % HS_POOL.length];
@@ -265,7 +299,13 @@ function FootprintsPage() {
   }, [filtered]);
 
   const counts = useMemo(() => {
-    const c: Record<string, number> = { all: 0, enterprise: 0, product: 0, bill: 0 };
+    const c: Record<string, number> = {
+      all: 0,
+      enterprise: 0,
+      contact: 0,
+      product: 0,
+      bill: 0,
+    };
     for (const it of visible) {
       if (date && !it.viewedAt.startsWith(formatDateKey(date))) continue;
       c.all++;
@@ -293,9 +333,9 @@ function FootprintsPage() {
   }, [visible]);
 
   const modDist = useMemo(() => {
-    const c = { enterprise: 0, product: 0, bill: 0 };
+    const c = { enterprise: 0, contact: 0, product: 0, bill: 0 };
     for (const it of visible) c[it.module]++;
-    const total = c.enterprise + c.product + c.bill || 1;
+    const total = c.enterprise + c.contact + c.product + c.bill || 1;
     return { ...c, total };
   }, [visible]);
 
@@ -365,6 +405,7 @@ function FootprintsPage() {
   const moduleOptions: { key: ModuleFilter; label: string; icon: typeof Building2 }[] = [
     { key: "all", label: "全部", icon: Footprints },
     { key: "enterprise", label: "企业", icon: Building2 },
+    { key: "contact", label: "人物", icon: UserRound },
     { key: "product", label: "商品", icon: Package },
     { key: "bill", label: "提单", icon: FileText },
   ];
