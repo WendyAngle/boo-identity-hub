@@ -83,6 +83,9 @@ import {
   type DateRangeValue,
   type PresetId,
 } from "@/components/billing/DateRangePicker";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_app/outreach/billing")({
   head: () => ({ meta: [{ title: "出海大数据平台 · 账单 | Boo数据平台" }] }),
@@ -134,17 +137,29 @@ function BillingPage() {
     | "recharge_refund";
   const [tab, setTab] = useState<TabKey>(tabFromUrl ?? "all");
   const [kw, setKw] = useState("");
-  const [datePreset, setDatePreset] = useState<PresetId>("all");
-  const [customRange, setCustomRange] = useState<DateRangeValue>(undefined);
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
+  const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
+  type OpKey =
+    | "all"
+    | "view_email" | "view_phone" | "view_social" | "view_address" | "view_title" | "view_seniority"
+    | "reach_email" | "reach_phone" | "reach_social"
+    | "ai_generate"
+    | "pay_alipay" | "pay_wechat" | "pay_corp";
+  const [op, setOp] = useState<OpKey>("all");
   const [rulesOpen, setRulesOpen] = useState(false);
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
   const filtered = useMemo(() => {
     const k = kw.trim().toLowerCase();
-    const range = resolvePreset(datePreset, customRange);
-    const fromMs = range?.from ? range.from.getTime() : undefined;
-    const toMs = range?.to ? range.to.getTime() : range?.from ? range.from.getTime() + 86399999 : undefined;
+    const fromMs = dateFrom
+      ? new Date(new Date(dateFrom).setHours(0, 0, 0, 0)).getTime()
+      : undefined;
+    const toMs = dateTo
+      ? new Date(new Date(dateTo).setHours(23, 59, 59, 999)).getTime()
+      : dateFrom
+        ? new Date(new Date(dateFrom).setHours(23, 59, 59, 999)).getTime()
+        : undefined;
     return ledger.filter((e) => {
       if (tab !== "all") {
         const consumeKinds: LedgerKind[] = ["view", "reach", "ai_generate"];
@@ -153,6 +168,18 @@ function BillingPage() {
         else if (tab === "recharge" && e.kind !== "recharge") return false;
         else if (tab === "expire" || tab === "package_recharge" || tab === "recharge_refund")
           return false;
+      }
+      if (op !== "all") {
+        if (op.startsWith("view_")) {
+          if (e.kind !== "view" || e.field !== op.slice(5)) return false;
+        } else if (op.startsWith("reach_")) {
+          if (e.kind !== "reach" || e.channel !== op.slice(6)) return false;
+        } else if (op === "ai_generate") {
+          if (e.kind !== "ai_generate") return false;
+        } else if (op.startsWith("pay_")) {
+          const pm = op.slice(4);
+          if (e.kind !== "recharge" || e.paymentMethod !== pm) return false;
+        }
       }
       if (fromMs !== undefined) {
         const t = new Date(e.createdAt).getTime();
@@ -167,11 +194,11 @@ function BillingPage() {
         (e.platform ?? "").toLowerCase().includes(k)
       );
     });
-  }, [ledger, tab, datePreset, customRange, kw]);
+  }, [ledger, tab, op, dateFrom, dateTo, kw]);
 
   useEffect(() => {
     setPage(1);
-  }, [tab, kw, datePreset, customRange]);
+  }, [tab, kw, op, dateFrom, dateTo]);
 
   const pageData = useMemo(
     () => filtered.slice((page - 1) * pageSize, page * pageSize),
