@@ -846,6 +846,70 @@ function FieldCell({ entry }: { entry: LedgerEntry }) {
   );
 }
 
+function DetailCell({ entry: e }: { entry: LedgerEntry }) {
+  const detail = e.detail ?? "—";
+  const prefix =
+    e.kind === "refund"
+      ? "触达失败退还 · "
+      : e.kind === "recharge"
+        ? "套餐充值 · "
+        : "";
+  const target =
+    e.kind === "recharge"
+      ? e.orderNo
+        ? `订单 ${e.orderNo}`
+        : ""
+      : e.targetKind === "enterprise"
+        ? e.targetName
+        : `${e.parentRef?.name ?? "—"} · ${e.targetName}`;
+  const link =
+    e.kind === "recharge"
+      ? null
+      : e.targetKind === "enterprise"
+        ? findEnterprise(e.targetId)
+          ? { to: "/outreach/enterprise/$id" as const, params: { id: e.targetId } }
+          : null
+        : (() => {
+            const [entId, idx] = e.targetId.split(":");
+            return findEnterprise(entId)
+              ? {
+                  to: "/outreach/enterprise/$id/contact/$idx" as const,
+                  params: { id: entId, idx },
+                }
+              : null;
+          })();
+  return (
+    <div className="min-w-0">
+      <div className="font-mono text-xs text-foreground truncate">
+        {prefix}
+        {detail}
+      </div>
+      {target && (
+        <div className="text-[11px] text-muted-foreground truncate mt-0.5 flex items-center gap-1">
+          {e.kind === "recharge" ? (
+            <Wallet className="h-3 w-3" />
+          ) : e.targetKind === "enterprise" ? (
+            <Building2 className="h-3 w-3" />
+          ) : (
+            <UserRound className="h-3 w-3" />
+          )}
+          {link ? (
+            <Link
+              to={link.to}
+              params={link.params as never}
+              className="capitalize hover:text-primary truncate"
+            >
+              {target}
+            </Link>
+          ) : (
+            <span className="capitalize truncate">{target}</span>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function TargetCell({ entry: e }: { entry: LedgerEntry }) {
   if (e.kind === "recharge") {
     return (
